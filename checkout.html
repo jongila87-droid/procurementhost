@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — ProcurementHost</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="page-head">
+    <div class="container">
+      <p class="crumb"><a href="index.html">Beranda</a> / <a href="index.html#harga">Harga</a> / Checkout</p>
+      <h1>Selesaikan Pesanan Anda 🛒</h1>
+      <p>Tinggal beberapa langkah lagi untuk meluncurkan website Anda.</p>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="checkout-grid">
+      <!-- Form -->
+      <form id="checkoutForm" class="panel" style="margin:0">
+        <h2 style="margin-bottom:6px">1. Pilih Paket</h2>
+        <div class="field">
+          <select id="planSelect"></select>
+        </div>
+
+        <h2 style="margin:18px 0 10px">2. Siklus Tagihan</h2>
+        <div class="cycle-opts">
+          <div class="cycle-opt sel" data-cycle="monthly">
+            <strong>Bulanan</strong><small id="cycMonthly">–</small>
+          </div>
+          <div class="cycle-opt" data-cycle="yearly">
+            <strong>Tahunan</strong><small id="cycYearly">– · Hemat 20%</small>
+          </div>
+        </div>
+
+        <h2 style="margin:22px 0 10px">3. Domain</h2>
+        <div class="field">
+          <label for="domain">Nama domain (opsional)</label>
+          <input type="text" id="domain" placeholder="cth: tokosaya.com" />
+          <span class="hint">Kosongkan jika Anda ingin pakai subdomain gratis nanti.</span>
+        </div>
+
+        <h2 style="margin:22px 0 10px">4. Metode Pembayaran</h2>
+        <div class="pay-list">
+          <label class="pay-opt sel"><input type="radio" name="pay" value="QRIS" checked /> 📱 QRIS / E-Wallet (GoPay, OVO, Dana)</label>
+          <label class="pay-opt"><input type="radio" name="pay" value="Transfer Bank" /> 🏦 Transfer Bank (BCA, Mandiri, BNI)</label>
+          <label class="pay-opt"><input type="radio" name="pay" value="Kartu Kredit" /> 💳 Kartu Kredit / Debit</label>
+        </div>
+
+        <p class="demo-note" style="margin-top:22px">
+          🔒 <strong>Demo:</strong> Ini simulasi. Tidak ada pembayaran nyata yang diproses.
+          Setelah klik bayar, layanan akan langsung muncul di dashboard Anda.
+        </p>
+      </form>
+
+      <!-- Ringkasan -->
+      <aside class="summary">
+        <h3>Ringkasan Pesanan</h3>
+        <div class="sum-row"><span>Paket</span><span id="sPlan">–</span></div>
+        <div class="sum-row"><span>Siklus</span><span id="sCycle">Bulanan</span></div>
+        <div class="sum-row"><span>Penyimpanan</span><span id="sStorage">–</span></div>
+        <div class="sum-row"><span>Domain</span><span id="sDomain">—</span></div>
+        <div class="sum-total"><span>Total</span><span id="sTotal">Rp0</span></div>
+        <button class="btn btn-primary btn-block" id="payBtn" style="margin-top:18px">Bayar Sekarang</button>
+        <p style="text-align:center;color:var(--muted);font-size:.82rem;margin-top:12px">💯 Garansi uang kembali 30 hari</p>
+      </aside>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const { Auth, Services, PLANS, toast, rp } = window.NH;
+      const params = new URLSearchParams(location.search);
+      let planKey = params.get('plan'); if (!PLANS[planKey]) planKey = 'bisnis';
+      let cycle = 'monthly';
+
+      // isi dropdown paket
+      const sel = document.getElementById('planSelect');
+      sel.innerHTML = Object.entries(PLANS).map(([k, p]) =>
+        `<option value="${k}" ${k===planKey?'selected':''}>${p.name} — ${rp(p.monthly)}/bln</option>`).join('');
+
+      // domain dari query (mis. dari pencarian di beranda)
+      const qDomain = params.get('domain');
+      if (qDomain) document.getElementById('domain').value = qDomain;
+
+      function price() { return cycle === 'yearly' ? PLANS[planKey].yearly * 12 : PLANS[planKey].monthly; }
+
+      function refresh() {
+        const p = PLANS[planKey];
+        document.getElementById('cycMonthly').textContent = rp(p.monthly) + '/bln';
+        document.getElementById('cycYearly').textContent = rp(p.yearly) + '/bln · Hemat 20%';
+        document.getElementById('sPlan').textContent = p.name;
+        document.getElementById('sCycle').textContent = cycle === 'yearly' ? 'Tahunan (12 bln)' : 'Bulanan';
+        document.getElementById('sStorage').textContent = p.storage;
+        const dom = document.getElementById('domain').value.trim();
+        document.getElementById('sDomain').textContent = dom || '—';
+        document.getElementById('sTotal').textContent = rp(price());
+      }
+      refresh();
+
+      sel.addEventListener('change', () => { planKey = sel.value; refresh(); });
+      document.getElementById('domain').addEventListener('input', refresh);
+
+      document.querySelectorAll('.cycle-opt').forEach(opt => opt.addEventListener('click', () => {
+        document.querySelectorAll('.cycle-opt').forEach(o => o.classList.remove('sel'));
+        opt.classList.add('sel'); cycle = opt.dataset.cycle; refresh();
+      }));
+      document.querySelectorAll('.pay-opt').forEach(opt => opt.addEventListener('click', () => {
+        document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('sel'));
+        opt.classList.add('sel');
+      }));
+
+      // Bayar
+      document.getElementById('payBtn').addEventListener('click', () => {
+        if (!Auth.current()) {
+          toast('Silakan masuk dulu untuk menyelesaikan pesanan.', 'info');
+          setTimeout(() => location.href = 'masuk.html?next=' + encodeURIComponent('checkout.html?plan=' + planKey), 1000);
+          return;
+        }
+        const p = PLANS[planKey];
+        Services.add({
+          planName: p.name,
+          plan: planKey,
+          cycle,
+          price: price(),
+          domain: document.getElementById('domain').value.trim(),
+          storage: p.storage,
+        });
+        toast(`Pembayaran berhasil! Paket ${p.name} aktif. 🎉`);
+        setTimeout(() => location.href = 'dashboard.html', 1100);
+      });
+    });
+  </script>
+</body>
+</html>

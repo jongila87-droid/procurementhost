@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daftar Akun — ProcurementHost</title>
+  <meta name="description" content="Buat akun ProcurementHost gratis dan mulai kelola hosting Anda." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="auth-wrap">
+    <div class="auth-card reveal">
+      <h1>Buat Akun Gratis ✨</h1>
+      <p class="sub">Daftar dalam 30 detik dan mulai kelola hosting Anda.</p>
+
+      <form id="registerForm" novalidate>
+        <div class="field" id="f-name">
+          <label for="name">Nama Lengkap</label>
+          <input type="text" id="name" placeholder="cth: Budi Santoso" autocomplete="name" />
+          <span class="field-err">Nama wajib diisi.</span>
+        </div>
+        <div class="field" id="f-email">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="nama@email.com" autocomplete="email" />
+          <span class="field-err">Masukkan email yang valid.</span>
+        </div>
+        <div class="field" id="f-pass">
+          <label for="password">Kata Sandi</label>
+          <input type="password" id="password" placeholder="Minimal 6 karakter" autocomplete="new-password" />
+          <span class="field-err">Kata sandi minimal 6 karakter.</span>
+          <span class="hint">Gunakan kombinasi huruf & angka agar lebih aman.</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Daftar Sekarang</button>
+      </form>
+
+      <p class="auth-alt">Sudah punya akun? <a href="masuk.html">Masuk di sini</a></p>
+
+      <div class="demo-note">
+        🔒 <strong>Catatan demo:</strong> Akun disimpan di browser Anda (localStorage),
+        bukan di server. Aman untuk latihan, jangan pakai kata sandi asli.
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const { Auth, toast } = window.NH;
+      const form = document.getElementById('registerForm');
+      const setErr = (id, on) => document.getElementById(id).classList.toggle('invalid', on);
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const pass = document.getElementById('password').value;
+        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        setErr('f-name', !name);
+        setErr('f-email', !emailOk);
+        setErr('f-pass', pass.length < 6);
+        if (!name || !emailOk || pass.length < 6) return;
+
+        try {
+          const user = Auth.register({ name, email, password: pass });
+          toast(`Selamat datang, ${user.name.split(' ')[0]}! 🎉 Akun berhasil dibuat.`);
+          setTimeout(() => location.href = 'dashboard.html', 900);
+        } catch (err) {
+          setErr('f-email', true);
+          document.querySelector('#f-email .field-err').textContent = err.message;
+          toast(err.message, 'error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

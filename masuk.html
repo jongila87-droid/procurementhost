@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — ProcurementHost</title>
+  <meta name="description" content="Masuk ke akun ProcurementHost Anda." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Library resmi Google Identity Services (untuk Login Google) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    /* ====== Halaman Login (meniru desain referensi) ====== */
+    .login-page {
+      min-height: calc(100vh - 70px);
+      display: grid; place-items: center;
+      padding: 40px 18px;
+      background: var(--bg-soft);
+    }
+    .login-card {
+      width: 100%; max-width: 430px;
+      background: #fff;
+      border: 1px solid #ececf3;
+      border-radius: 18px;
+      box-shadow: 0 18px 50px -24px rgba(40, 30, 90, .25);
+      padding: 36px 34px 30px;
+    }
+    .login-title {
+      text-align: center;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      font-size: 2rem;
+      color: #241c54;
+      margin-bottom: 18px;
+    }
+
+    /* Tab brand: Procurement | Host */
+    .brand-tabs { display: flex; gap: 12px; justify-content: center; margin-bottom: 26px; }
+    .brand-tab {
+      flex: 1; max-width: 150px;
+      padding: 13px 10px;
+      border-radius: 12px;
+      border: 1px solid #e6e8f2;
+      background: #eef0f8;
+      color: #2a2550;
+      font-family: inherit; font-weight: 700; font-size: .92rem;
+      cursor: pointer; transition: .2s;
+    }
+    .brand-tab:hover { border-color: #c9cef0; }
+    .brand-tab.active {
+      background: #d4e3fb;
+      border-color: #b9d2f7;
+      color: #1d3a63;
+      box-shadow: 0 6px 14px -6px rgba(59, 130, 246, .5);
+    }
+
+    /* Tombol Google */
+    .google-btn {
+      width: 100%;
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px;
+      padding: 13px;
+      border: 1px solid #e3e6ef;
+      border-radius: 10px;
+      background: #fff; cursor: pointer;
+      transition: .2s;
+    }
+    .google-btn:hover { background: #f8fafc; border-color: #cfd5e6; }
+
+    /* Pemisah "atau" */
+    .or-line { display: flex; align-items: center; gap: 14px; color: #9aa0b3; font-size: .9rem; margin: 22px 0; }
+    .or-line::before, .or-line::after { content: ''; height: 1px; background: #e8eaf1; flex: 1; }
+
+    /* Field */
+    .lf { margin-bottom: 16px; }
+    .lf label { display: block; color: #8a8fa6; font-size: .85rem; margin-bottom: 7px; }
+    .lf input {
+      width: 100%;
+      border: 1px solid #e3e6ef;
+      border-radius: 10px;
+      padding: 13px 14px;
+      font-size: .96rem; font-family: inherit; color: #1f2440;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .lf input:focus { outline: 0; border-color: #6d28d9; box-shadow: 0 0 0 3px rgba(109, 40, 217, .14); }
+    .lf.invalid input { border-color: #dc2626; }
+
+    .pass-box { position: relative; }
+    .pass-box input { padding-right: 46px; }
+    .eye-btn {
+      position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+      background: none; border: 0; cursor: pointer; color: #6b7280;
+      padding: 8px; display: grid; place-items: center; border-radius: 8px;
+    }
+    .eye-btn:hover { color: #6d28d9; background: #f3f0fc; }
+
+    .link-purple { color: #6d28d9; font-weight: 700; }
+    .link-purple:hover { text-decoration: underline; }
+
+    .forgot { display: inline-block; font-size: .9rem; margin: 2px 0 22px; }
+
+    .login-submit {
+      width: 100%;
+      background: #6d28d9; color: #fff;
+      border: 0; border-radius: 10px;
+      padding: 15px; font-size: 1rem; font-weight: 700; font-family: inherit;
+      cursor: pointer; transition: .2s;
+    }
+    .login-submit:hover { background: #5b21b6; box-shadow: 0 12px 24px -10px rgba(109, 40, 217, .7); }
+    .login-submit:active { transform: translateY(1px); }
+
+    .cant { display: block; text-align: center; margin: 22px 0 14px; font-size: .95rem; }
+    .signup-line { text-align: center; color: #6b7185; font-size: .95rem; }
+
+    /* Dark mode menyesuaikan */
+    [data-theme="dark"] .login-card { background: var(--card); border-color: var(--line); }
+    [data-theme="dark"] .login-title { color: #e8edf5; }
+    [data-theme="dark"] .lf input, [data-theme="dark"] .google-btn { background: var(--bg-soft); border-color: var(--line); color: var(--ink); }
+    [data-theme="dark"] .brand-tab { background: #1e2a44; border-color: var(--line); color: #cdd5e6; }
+    [data-theme="dark"] .brand-tab.active { background: #1d3358; border-color: #2c4a78; color: #cfe0fb; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="login-page">
+    <div class="login-card reveal">
+      <h1 class="login-title">Login</h1>
+
+      <!-- Tab brand: Procurement | Host -->
+      <div class="brand-tabs" role="tablist" aria-label="Pilih brand">
+        <button type="button" class="brand-tab active" data-tab="procurement" role="tab" aria-selected="true">Procurement</button>
+        <button type="button" class="brand-tab" data-tab="host" role="tab" aria-selected="false">Host</button>
+      </div>
+
+      <!-- Login Google -->
+      <button type="button" class="google-btn" id="googleBtn" aria-label="Login dengan Google">
+        <svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.2 35 24 35c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/>
+          <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+          <path fill="#4CAF50" d="M24 44c5.5 0 10.5-2.1 14.3-5.6l-6.6-5.4C29.6 34.6 27 35 24 35c-5.2 0-9.6-3.3-11.3-7.9l-6.6 5.1C9.6 39.6 16.2 44 24 44z"/>
+          <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.3 5.6l6.6 5.4C41.9 36.3 44 30.6 44 24c0-1.3-.1-2.3-.4-3.5z"/>
+        </svg>
+      </button>
+
+      <div class="or-line"><span>atau</span></div>
+
+      <form id="loginForm" novalidate>
+        <div class="lf" id="f-email">
+          <label for="email">Email</label>
+          <input type="email" id="email" autocomplete="email" />
+        </div>
+        <div class="lf" id="f-pass">
+          <label for="password">Password</label>
+          <div class="pass-box">
+            <input type="password" id="password" autocomplete="current-password" />
+            <button type="button" class="eye-btn" id="eyeBtn" aria-label="Tampilkan kata sandi"></button>
+          </div>
+        </div>
+
+        <a href="#" class="link-purple forgot" id="forgotLink">Lupa password?</a>
+
+        <button type="submit" class="login-submit">Login</button>
+      </form>
+
+      <a href="#" class="link-purple cant" id="cantLink">Tidak bisa akses akun?</a>
+      <p class="signup-line">Belum punya akun? <a href="daftar.html" class="link-purple">Daftar</a></p>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const { Auth, toast } = window.NH;
+      const params = new URLSearchParams(location.search);
+      const next = params.get('next') || 'dashboard.html';
+
+      // --- Tab brand (Procurement / Host) ---
+      document.querySelectorAll('.brand-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.brand-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+          tab.classList.add('active'); tab.setAttribute('aria-selected', 'true');
+        });
+      });
+
+      // --- Ikon mata (tampil/sembunyi sandi) ---
+      const eyeOpen = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+      const eyeOff  = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20C5 20 1 12 1 12a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+      const eyeBtn = document.getElementById('eyeBtn');
+      const passInput = document.getElementById('password');
+      eyeBtn.innerHTML = eyeOpen;
+      eyeBtn.addEventListener('click', () => {
+        const show = passInput.type === 'password';
+        passInput.type = show ? 'text' : 'password';
+        eyeBtn.innerHTML = show ? eyeOff : eyeOpen;
+        eyeBtn.setAttribute('aria-label', show ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
+      });
+
+      // --- Tombol Google (LOGIN ASLI via Google Identity Services) ---
+      const CLIENT_ID = window.NH.GOOGLE_CLIENT_ID;
+      document.getElementById('googleBtn').addEventListener('click', () => {
+        // Belum dikonfigurasi: arahkan ke panduan
+        if (!CLIENT_ID) {
+          toast('Login Google belum dikonfigurasi. Buka file PANDUAN-LOGIN-GOOGLE.md untuk mengaktifkannya. Sementara, pakai email & sandi. 🙂', 'info');
+          return;
+        }
+        // Library Google belum termuat
+        if (!(window.google && google.accounts && google.accounts.oauth2)) {
+          toast('Sedang memuat layanan Google… coba klik lagi sebentar lagi.', 'info');
+          return;
+        }
+        // Minta izin & ambil token akses, lalu ambil profil pengguna
+        const tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: 'openid email profile',
+          callback: async (resp) => {
+            if (resp.error || !resp.access_token) { toast('Login Google dibatalkan.', 'error'); return; }
+            try {
+              const info = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: 'Bearer ' + resp.access_token },
+              }).then(r => r.json());
+              const user = Auth.loginWithGoogle({ name: info.name, email: info.email, picture: info.picture });
+              toast(`Berhasil masuk via Google. Halo, ${user.name.split(' ')[0]}! ✅`);
+              setTimeout(() => location.href = next, 800);
+            } catch (err) {
+              toast('Gagal mengambil profil dari Google. Coba lagi.', 'error');
+            }
+          },
+        });
+        tokenClient.requestAccessToken();
+      });
+
+      // --- Link bantuan (simulasi) ---
+      document.getElementById('forgotLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        toast('Tautan reset sandi akan dikirim ke email Anda (simulasi).', 'info');
+      });
+      document.getElementById('cantLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        toast('Hubungi dukungan via WhatsApp atau Pusat Bantuan untuk pemulihan akun.', 'info');
+      });
+
+      // --- Proses Login ---
+      const setErr = (id, on) => document.getElementById(id).classList.toggle('invalid', on);
+      document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const pass = passInput.value;
+        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        setErr('f-email', !emailOk);
+        setErr('f-pass', !pass);
+        if (!emailOk || !pass) { toast('Mohon isi email dan kata sandi dengan benar.', 'error'); return; }
+
+        try {
+          const user = Auth.login({ email, password: pass });
+          toast(`Berhasil masuk. Halo, ${user.name.split(' ')[0]}! ✅`);
+          setTimeout(() => location.href = next, 800);
+        } catch (err) {
+          setErr('f-pass', true);
+          toast(err.message + ' Belum punya akun? Silakan Daftar.', 'error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

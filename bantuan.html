@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pusat Bantuan — ProcurementHost</title>
+  <meta name="description" content="Pusat bantuan ProcurementHost — temukan jawaban atau hubungi tim kami." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="page-head">
+    <div class="container">
+      <p class="crumb"><a href="index.html">Beranda</a> / Pusat Bantuan</p>
+      <h1>Ada yang bisa kami bantu? 🤝</h1>
+      <p>Temukan jawaban cepat, atau hubungi tim dukungan kami yang ramah.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="help-grid">
+        <div class="help-card reveal"><div class="h-ic">📚</div><h3>Basis Pengetahuan</h3><p>Ratusan panduan langkah demi langkah untuk semua kebutuhan Anda.</p></div>
+        <div class="help-card reveal"><div class="h-ic">💬</div><h3>Live Chat</h3><p>Ngobrol langsung dengan tim kami via tombol chat di kanan bawah.</p></div>
+        <div class="help-card reveal"><div class="h-ic">📱</div><h3>WhatsApp</h3><p>Hubungi kami kapan saja di +62 812-3456-7890.</p></div>
+      </div>
+
+      <div class="section-head reveal" style="margin-top:40px">
+        <span class="eyebrow">Pertanyaan Umum</span>
+        <h2>Pertanyaan yang sering diajukan</h2>
+      </div>
+      <div class="faq-list" style="max-width:760px;margin:0 auto">
+        <div class="faq-item reveal"><button class="faq-q">Bagaimana cara memesan hosting? <span class="faq-ic">+</span></button><div class="faq-a"><p>Pilih paket di halaman <a href="index.html#harga">Harga</a>, klik "Pilih", lalu isi data di halaman checkout. Setelah login, layanan langsung aktif di dashboard.</p></div></div>
+        <div class="faq-item reveal"><button class="faq-q">Bagaimana cara mereset kata sandi? <span class="faq-ic">+</span></button><div class="faq-a"><p>Pada versi demo ini, kata sandi tersimpan di browser. Untuk produksi sungguhan, fitur reset via email akan tersedia.</p></div></div>
+        <div class="faq-item reveal"><button class="faq-q">Di mana saya melihat tagihan? <span class="faq-ic">+</span></button><div class="faq-a"><p>Semua tagihan dapat dilihat di <a href="dashboard.html">Dashboard</a> bagian "Riwayat Tagihan" setelah Anda masuk.</p></div></div>
+        <div class="faq-item reveal"><button class="faq-q">Apakah saya bisa membatalkan layanan? <span class="faq-ic">+</span></button><div class="faq-a"><p>Bisa. Di dashboard, pada tabel "Layanan Hosting", klik tombol "Hapus" pada layanan yang ingin dibatalkan.</p></div></div>
+      </div>
+
+      <!-- Form tiket -->
+      <div class="panel reveal" style="max-width:620px;margin:50px auto 0">
+        <div class="panel-head"><h2>📨 Kirim Tiket Dukungan</h2></div>
+        <form id="ticketForm">
+          <div class="field"><label for="tName">Nama</label><input type="text" id="tName" placeholder="Nama Anda" /></div>
+          <div class="field"><label for="tEmail">Email</label><input type="email" id="tEmail" placeholder="nama@email.com" /></div>
+          <div class="field"><label for="tTopic">Topik</label>
+            <select id="tTopic">
+              <option>Pertanyaan umum</option>
+              <option>Masalah teknis</option>
+              <option>Tagihan & pembayaran</option>
+              <option>Domain</option>
+            </select>
+          </div>
+          <div class="field"><label for="tMsg">Pesan</label><textarea id="tMsg" rows="4" placeholder="Jelaskan kebutuhan Anda…"></textarea></div>
+          <button type="submit" class="btn btn-primary btn-block">Kirim Tiket</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const { toast } = window.NH;
+      // FAQ accordion
+      document.querySelectorAll('.faq-item').forEach(item => {
+        item.querySelector('.faq-q').addEventListener('click', () => {
+          const a = item.querySelector('.faq-a');
+          const open = item.classList.toggle('open');
+          a.style.maxHeight = open ? a.scrollHeight + 'px' : null;
+        });
+      });
+      // Form tiket
+      document.getElementById('ticketForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('tName').value.trim();
+        const email = document.getElementById('tEmail').value.trim();
+        if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          toast('Mohon isi nama dan email yang valid.', 'error'); return;
+        }
+        toast('Tiket terkirim! Tim kami akan membalas < 5 menit. 🎫');
+        e.target.reset();
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — ProcurementHost</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="dash">
+    <div class="container dash-grid">
+      <!-- Sidebar -->
+      <aside class="dash-side">
+        <div class="dash-user">
+          <div class="ava" id="userAva">–</div>
+          <strong id="userName">–</strong>
+          <small id="userEmail">–</small>
+        </div>
+        <nav class="dash-nav">
+          <a href="#ringkasan" class="active">📊 Ringkasan</a>
+          <a href="#layanan">🖥️ Layanan Saya</a>
+          <a href="#domain">🌐 Domain</a>
+          <a href="#tagihan">🧾 Tagihan</a>
+          <a href="#profil">👤 Profil</a>
+          <a href="index.html#harga">➕ Pesan Baru</a>
+        </nav>
+      </aside>
+
+      <!-- Konten -->
+      <div class="dash-main">
+        <div class="dash-welcome reveal">
+          <h1 id="welcomeTitle">Halo! 👋</h1>
+          <p>Selamat datang di pusat kendali hosting Anda.</p>
+        </div>
+
+        <!-- KPI -->
+        <section class="kpi-row" id="ringkasan">
+          <div class="kpi reveal"><div class="k-ic">🖥️</div><div class="k-num" id="kpiServices">0</div><div class="k-lbl">Layanan aktif</div></div>
+          <div class="kpi reveal"><div class="k-ic">🌐</div><div class="k-num" id="kpiDomains">0</div><div class="k-lbl">Domain terdaftar</div></div>
+          <div class="kpi reveal"><div class="k-ic">🧾</div><div class="k-num" id="kpiBill">Rp0</div><div class="k-lbl">Tagihan bulan ini</div></div>
+        </section>
+
+        <!-- Layanan -->
+        <section class="panel reveal" id="layanan">
+          <div class="panel-head">
+            <h2>🖥️ Layanan Hosting</h2>
+            <a href="index.html#harga" class="btn btn-primary btn-xs">+ Tambah Layanan</a>
+          </div>
+          <div id="servicesArea"></div>
+        </section>
+
+        <!-- Domain -->
+        <section class="panel reveal" id="domain">
+          <div class="panel-head"><h2>🌐 Domain</h2></div>
+          <div id="domainsArea"></div>
+        </section>
+
+        <!-- Tagihan -->
+        <section class="panel reveal" id="tagihan">
+          <div class="panel-head"><h2>🧾 Riwayat Tagihan</h2></div>
+          <div id="invoicesArea"></div>
+        </section>
+
+        <!-- Profil -->
+        <section class="panel reveal" id="profil">
+          <div class="panel-head"><h2>👤 Profil Saya</h2></div>
+          <form id="profileForm" style="max-width:460px">
+            <div class="field">
+              <label for="pName">Nama Lengkap</label>
+              <input type="text" id="pName" />
+            </div>
+            <div class="field">
+              <label for="pEmail">Email</label>
+              <input type="email" id="pEmail" disabled />
+              <span class="hint">Email tidak dapat diubah pada akun demo.</span>
+            </div>
+            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+            <button type="button" class="btn btn-danger btn-xs" id="resetData" style="margin-left:8px">Hapus semua data demo</button>
+          </form>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const { Auth, Services, toast, rp, store } = window.NH;
+      const user = Auth.require();          // wajib login
+      if (!user) return;
+
+      // Header sidebar
+      const initials = user.name.split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase();
+      document.getElementById('userAva').textContent = initials;
+      document.getElementById('userName').textContent = user.name;
+      document.getElementById('userEmail').textContent = user.email;
+      document.getElementById('welcomeTitle').textContent = `Halo, ${user.name.split(' ')[0]}! 👋`;
+      document.getElementById('pName').value = user.name;
+      document.getElementById('pEmail').value = user.email;
+
+      const fmtDate = (ts) => new Date(ts).toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
+
+      function render() {
+        const svcs = Services.mine();
+        const withDomain = svcs.filter(s => s.domain);
+        const monthlyTotal = svcs.reduce((sum, s) => sum + (s.cycle === 'yearly' ? Math.round(s.price/12) : s.price), 0);
+
+        document.getElementById('kpiServices').textContent = svcs.length;
+        document.getElementById('kpiDomains').textContent = withDomain.length;
+        document.getElementById('kpiBill').textContent = rp(monthlyTotal);
+
+        // --- Layanan ---
+        const sa = document.getElementById('servicesArea');
+        if (!svcs.length) {
+          sa.innerHTML = `<div class="empty"><div class="e-ic">📦</div><p>Belum ada layanan. <a href="index.html#harga" style="color:var(--indigo);font-weight:600">Pesan paket pertama Anda →</a></p></div>`;
+        } else {
+          sa.innerHTML = `<div class="table-wrap"><table class="table">
+            <thead><tr><th>ID</th><th>Paket</th><th>Domain</th><th>Siklus</th><th>Harga</th><th>Status</th><th></th></tr></thead>
+            <tbody>${svcs.map(s => `
+              <tr>
+                <td>${s.id}</td>
+                <td><strong>${s.planName}</strong></td>
+                <td>${s.domain || '—'}</td>
+                <td>${s.cycle === 'yearly' ? 'Tahunan' : 'Bulanan'}</td>
+                <td>${rp(s.price)}</td>
+                <td><span class="tag tag-green">Aktif</span></td>
+                <td><button class="btn btn-danger btn-xs" data-del="${s.id}">Hapus</button></td>
+              </tr>`).join('')}
+            </tbody></table></div>`;
+        }
+
+        // --- Domain ---
+        const da = document.getElementById('domainsArea');
+        if (!withDomain.length) {
+          da.innerHTML = `<div class="empty"><div class="e-ic">🌐</div><p>Belum ada domain terdaftar.</p></div>`;
+        } else {
+          da.innerHTML = `<div class="table-wrap"><table class="table">
+            <thead><tr><th>Domain</th><th>Terhubung ke</th><th>Kedaluwarsa</th><th>Status</th></tr></thead>
+            <tbody>${withDomain.map(s => `
+              <tr>
+                <td><strong>${s.domain}</strong></td>
+                <td>${s.planName}</td>
+                <td>${fmtDate(s.createdAt + 365*24*3600*1000)}</td>
+                <td><span class="tag tag-blue">Terhubung</span></td>
+              </tr>`).join('')}
+            </tbody></table></div>`;
+        }
+
+        // --- Tagihan ---
+        const ia = document.getElementById('invoicesArea');
+        if (!svcs.length) {
+          ia.innerHTML = `<div class="empty"><div class="e-ic">🧾</div><p>Belum ada tagihan.</p></div>`;
+        } else {
+          ia.innerHTML = `<div class="table-wrap"><table class="table">
+            <thead><tr><th>No. Invoice</th><th>Tanggal</th><th>Keterangan</th><th>Jumlah</th><th>Status</th></tr></thead>
+            <tbody>${svcs.map((s,i) => `
+              <tr>
+                <td>INV-${String(1001+i)}</td>
+                <td>${fmtDate(s.createdAt)}</td>
+                <td>Hosting ${s.planName} (${s.cycle === 'yearly' ? '1 tahun' : '1 bulan'})</td>
+                <td>${rp(s.price)}</td>
+                <td><span class="tag tag-green">Lunas</span></td>
+              </tr>`).join('')}
+            </tbody></table></div>`;
+        }
+
+        // tombol hapus
+        sa.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+          Services.remove(b.dataset.del);
+          toast('Layanan dihapus.', 'info');
+          render();
+        }));
+      }
+      render();
+
+      // Profil
+      document.getElementById('profileForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newName = document.getElementById('pName').value.trim();
+        if (!newName) return;
+        const users = Auth.users();
+        const idx = users.findIndex(u => u.email === user.email);
+        if (idx > -1) { users[idx].name = newName; Auth.saveUsers(users); }
+        toast('Profil diperbarui! ✅');
+        setTimeout(() => location.reload(), 700);
+      });
+
+      // Reset data demo
+      document.getElementById('resetData').addEventListener('click', () => {
+        if (!confirm('Hapus SEMUA data demo (akun, layanan, sesi)? Tindakan ini tidak bisa dibatalkan.')) return;
+        ['nh_users','nh_session','nh_services'].forEach(store.del);
+        toast('Semua data demo dihapus.', 'info');
+        setTimeout(() => location.href = 'index.html', 900);
+      });
+
+      // smooth scroll & active state sidebar
+      document.querySelectorAll('.dash-nav a[href^="#"]').forEach(a => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.querySelectorAll('.dash-nav a').forEach(x => x.classList.remove('active'));
+          a.classList.add('active');
+          document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+    });
+  </script>
+</body>
+</html>
