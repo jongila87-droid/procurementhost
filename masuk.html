@@ -233,10 +233,11 @@
         tokenClient.requestAccessToken();
       });
 
-      // --- Link bantuan (simulasi) ---
+      // --- Lupa password → halaman reset (bawa email yang sudah diketik) ---
       document.getElementById('forgotLink').addEventListener('click', (e) => {
         e.preventDefault();
-        toast('Tautan reset sandi akan dikirim ke email Anda (simulasi).', 'info');
+        const typed = document.getElementById('email').value.trim();
+        location.href = 'lupa-password.html' + (typed ? '?email=' + encodeURIComponent(typed) : '');
       });
       document.getElementById('cantLink').addEventListener('click', (e) => {
         e.preventDefault();

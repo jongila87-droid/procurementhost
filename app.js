@@ -83,6 +83,36 @@
       return user;
     },
     logout() { store.del('nh_session'); },
+    // Cari user berdasarkan email
+    findByEmail(email) {
+      email = (email || '').trim().toLowerCase();
+      return Auth.users().find(u => u.email === email) || null;
+    },
+    emailExists(email) { return !!Auth.findByEmail(email); },
+    // Ganti kata sandi (butuh sandi lama) — dipakai di dashboard
+    changePassword({ currentPassword, newPassword }) {
+      const u = Auth.current();
+      if (!u) throw new Error('Anda belum masuk.');
+      if (u.provider === 'google') throw new Error('Akun Google tidak memakai kata sandi di sini. Kelola sandi lewat akun Google Anda.');
+      if (u.password !== currentPassword) throw new Error('Kata sandi saat ini salah.');
+      if (!newPassword || newPassword.length < 6) throw new Error('Kata sandi baru minimal 6 karakter.');
+      if (newPassword === currentPassword) throw new Error('Kata sandi baru tidak boleh sama dengan yang lama.');
+      const users = Auth.users();
+      const i = users.findIndex(x => x.email === u.email);
+      users[i].password = newPassword; Auth.saveUsers(users);
+      return true;
+    },
+    // Reset kata sandi tanpa sandi lama (alur "lupa password" — simulasi)
+    resetPassword({ email, newPassword }) {
+      email = (email || '').trim().toLowerCase();
+      const users = Auth.users();
+      const i = users.findIndex(x => x.email === email);
+      if (i < 0) throw new Error('Email tidak ditemukan.');
+      if (users[i].provider === 'google') throw new Error('Akun ini memakai Login Google, jadi tidak punya kata sandi untuk direset.');
+      if (!newPassword || newPassword.length < 6) throw new Error('Kata sandi baru minimal 6 karakter.');
+      users[i].password = newPassword; Auth.saveUsers(users);
+      return true;
+    },
     // Lindungi halaman: jika belum login, lempar ke halaman masuk
     require() {
       const u = Auth.current();
@@ -92,18 +122,102 @@
   };
 
   /* ===== Layanan & tagihan milik user (untuk dashboard) ===== */
+  const CYCLE_MS = { monthly: 30 * 24 * 3600 * 1000, yearly: 365 * 24 * 3600 * 1000 };
+
   const Services = {
     all:  () => store.get('nh_services', []),
     mine: () => { const u = Auth.current(); return u ? Services.all().filter(s => s.owner === u.email) : []; },
+    // Harga total satu siklus untuk sebuah paket
+    priceFor: (planKey, cycle) => {
+      const p = PLANS[planKey]; if (!p) return 0;
+      return cycle === 'yearly' ? p.yearly * 12 : p.monthly;
+    },
     add(svc) {
       const u = Auth.current(); if (!u) return null;
       const list = Services.all();
       const id = 'NH' + (1000 + list.length + 1);
-      const item = { id, owner: u.email, status: 'aktif', createdAt: Date.now(), ...svc };
+      const now = Date.now();
+      const item = { id, owner: u.email, status: 'aktif', createdAt: now,
+        expiresAt: now + (CYCLE_MS[svc.cycle] || CYCLE_MS.monthly), ...svc };
       list.push(item); store.set('nh_services', list);
+      // Catat invoice pembelian (langsung lunas)
+      Billing.add({ serviceId: id, type: 'beli', cycle: svc.cycle, amount: item.price, status: 'paid',
+        desc: `Hosting ${item.planName} (${svc.cycle === 'yearly' ? '1 tahun' : '1 bulan'})` });
       return item;
     },
-    remove(id) { store.set('nh_services', Services.all().filter(s => s.id !== id)); },
+    // Ubah paket (upgrade/downgrade) — kembalikan { service, diff }
+    changePlan(id, newPlanKey) {
+      const list = Services.all();
+      const s = list.find(x => x.id === id);
+      const np = PLANS[newPlanKey];
+      if (!s || !np) return null;
+      const oldPrice = s.price;
+      s.plan = newPlanKey; s.planName = np.name; s.storage = np.storage;
+      s.price = Services.priceFor(newPlanKey, s.cycle);
+      store.set('nh_services', list);
+      return { service: s, diff: s.price - oldPrice };
+    },
+    // Perpanjang masa aktif (dipanggil setelah invoice perpanjangan dibayar)
+    extend(id, cycle) {
+      const list = Services.all();
+      const s = list.find(x => x.id === id); if (!s) return null;
+      const base = Math.max(s.expiresAt || Date.now(), Date.now());
+      s.expiresAt = base + (CYCLE_MS[cycle] || CYCLE_MS.monthly);
+      s.status = 'aktif';
+      store.set('nh_services', list);
+      return s;
+    },
+    remove(id) {
+      store.set('nh_services', Services.all().filter(s => s.id !== id));
+      Billing.dropPendingFor(id); // buang tagihan tertunda layanan itu (riwayat lunas tetap disimpan)
+    },
+  };
+
+  /* ===== Tagihan / Invoice milik user ===== */
+  const Billing = {
+    all:  () => store.get('nh_invoices', []),
+    mine: () => { const u = Auth.current(); return u ? Billing.all().filter(i => i.owner === u.email) : []; },
+    pendingMine: () => Billing.mine().filter(i => i.status === 'pending'),
+    add({ serviceId, desc, amount, status = 'paid', cycle, type = 'beli', date }) {
+      const u = Auth.current(); if (!u) return null;
+      const list = Billing.all();
+      const seq = store.get('nh_invseq', 1000) + 1;
+      store.set('nh_invseq', seq);
+      const inv = { id: 'INV-' + seq, owner: u.email, serviceId, desc, amount,
+        status, cycle, type, date: date || Date.now() };
+      list.push(inv); store.set('nh_invoices', list);
+      return inv;
+    },
+    pay(id) {
+      const list = Billing.all();
+      const inv = list.find(i => i.id === id);
+      if (!inv || inv.status === 'paid') return null;
+      inv.status = 'paid'; inv.paidAt = Date.now();
+      store.set('nh_invoices', list);
+      if (inv.type === 'perpanjang' && inv.serviceId) Services.extend(inv.serviceId, inv.cycle);
+      return inv;
+    },
+    dropPendingFor(serviceId) {
+      store.set('nh_invoices', Billing.all().filter(i => !(i.serviceId === serviceId && i.status === 'pending')));
+    },
+    // Lengkapi data lama: layanan tanpa expiresAt / tanpa invoice pembelian
+    seedMissing() {
+      const u = Auth.current(); if (!u) return;
+      const svcs = Services.all();
+      let changed = false;
+      svcs.forEach(s => {
+        if (s.owner === u.email && !s.expiresAt) {
+          s.expiresAt = (s.createdAt || Date.now()) + (CYCLE_MS[s.cycle] || CYCLE_MS.monthly);
+          changed = true;
+        }
+      });
+      if (changed) store.set('nh_services', svcs);
+      Services.mine().forEach(s => {
+        const has = Billing.all().some(i => i.serviceId === s.id && i.type === 'beli');
+        if (!has) Billing.add({ serviceId: s.id, type: 'beli', cycle: s.cycle, amount: s.price, status: 'paid',
+          date: s.createdAt, desc: `Hosting ${s.planName} (${s.cycle === 'yearly' ? '1 tahun' : '1 bulan'})` });
+      });
+    },
   };
 
   /* =====================================================================
@@ -350,6 +464,38 @@
   }
 
   /* =====================================================================
+     5b. MODAL (dialog konfirmasi serbaguna)
+     ===================================================================== */
+  // opts: { title, body (HTML string), actions:[{label, variant, onClick(close, root)}] }
+  function modal({ title = '', body = '', actions = [] } = {}) {
+    const back = document.createElement('div');
+    back.className = 'modal-back';
+    back.innerHTML = `
+      <div class="modal" role="dialog" aria-modal="true" aria-label="${title}">
+        <div class="modal-head"><h3>${title}</h3><button class="modal-x" aria-label="Tutup">✕</button></div>
+        <div class="modal-body">${body}</div>
+        <div class="modal-foot"></div>
+      </div>`;
+    document.body.appendChild(back);
+    const close = () => { back.classList.remove('show'); setTimeout(() => back.remove(), 220); };
+    const foot = back.querySelector('.modal-foot');
+    actions.forEach(a => {
+      const b = document.createElement('button');
+      b.className = 'btn btn-sm ' + (a.variant || 'btn-outline');
+      b.textContent = a.label;
+      b.addEventListener('click', () => a.onClick ? a.onClick(close, back) : close());
+      foot.appendChild(b);
+    });
+    back.querySelector('.modal-x').addEventListener('click', close);
+    back.addEventListener('click', (e) => { if (e.target === back) close(); });
+    document.addEventListener('keydown', function esc(e) {
+      if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+    });
+    requestAnimationFrame(() => back.classList.add('show'));
+    return { root: back, close };
+  }
+
+  /* =====================================================================
      6. BANNER COOKIE
      ===================================================================== */
   function initCookie() {
@@ -573,5 +719,5 @@
   });
 
   /* ===== Ekspor ke global agar halaman lain bisa pakai ===== */
-  window.NH = { Auth, Services, PLANS, toast, rp, store, $, $$, PAGE, GOOGLE_CLIENT_ID };
+  window.NH = { Auth, Services, Billing, PLANS, toast, modal, rp, store, $, $$, PAGE, GOOGLE_CLIENT_ID };
 })();
