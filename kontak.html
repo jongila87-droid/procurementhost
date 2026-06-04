@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kontak — ProcurementHost</title>
+  <meta name="description" content="Hubungi tim ProcurementHost. Kami siap membantu 24/7 via chat, email, dan WhatsApp." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="page-head">
+    <div class="container">
+      <p class="crumb"><a href="index.html">Beranda</a> / Kontak</p>
+      <h1>Hubungi Kami 📨</h1>
+      <p>Ada pertanyaan atau butuh bantuan? Tim kami siap membantu Anda 24 jam sehari.</p>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="contact-grid">
+      <!-- Info kontak -->
+      <div>
+        <div class="contact-info">
+          <div class="contact-item reveal">
+            <span class="ci-ic">📍</span>
+            <div>
+              <h3>Alamat Kantor</h3>
+              <p>Gedung Cyber Tower, Lantai 12<br />Jl. Jenderal Sudirman Kav. 1<br />Jakarta Selatan 12190, Indonesia</p>
+            </div>
+          </div>
+          <div class="contact-item reveal">
+            <span class="ci-ic">✉️</span>
+            <div>
+              <h3>Email</h3>
+              <p><a href="mailto:halo@procurementhost.id">halo@procurementhost.id</a><br /><a href="mailto:dukungan@procurementhost.id">dukungan@procurementhost.id</a></p>
+            </div>
+          </div>
+          <div class="contact-item reveal">
+            <span class="ci-ic">📱</span>
+            <div>
+              <h3>Telepon &amp; WhatsApp</h3>
+              <p><a href="https://wa.me/6281234567890" target="_blank" rel="noopener">+62 812-3456-7890</a><br />(021) 5000-1234</p>
+            </div>
+          </div>
+          <div class="contact-item reveal">
+            <span class="ci-ic">🕐</span>
+            <div>
+              <h3>Jam Operasional</h3>
+              <p>Dukungan teknis: 24 jam / 7 hari<br />Kantor: Senin–Jumat, 09.00–18.00 WIB</p>
+            </div>
+          </div>
+        </div>
+
+        <iframe class="map-embed reveal" loading="lazy" title="Peta lokasi kantor ProcurementHost"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=106.80%2C-6.24%2C106.89%2C-6.18&amp;layer=mapnik&amp;marker=-6.2088%2C106.8456"></iframe>
+      </div>
+
+      <!-- Form kontak -->
+      <div class="panel reveal" style="margin:0">
+        <div class="panel-head"><h2>💬 Kirim Pesan</h2></div>
+        <form id="contactPageForm" novalidate>
+          <div class="field"><label for="cnName">Nama Lengkap</label><input type="text" id="cnName" placeholder="Nama Anda" /></div>
+          <div class="field"><label for="cnEmail">Email</label><input type="email" id="cnEmail" placeholder="nama@email.com" /></div>
+          <div class="field"><label for="cnSubject">Subjek</label>
+            <select id="cnSubject">
+              <option>Pertanyaan umum</option>
+              <option>Penjualan &amp; harga</option>
+              <option>Dukungan teknis</option>
+              <option>Kerja sama / partnership</option>
+            </select>
+          </div>
+          <div class="field"><label for="cnMsg">Pesan</label><textarea id="cnMsg" rows="5" placeholder="Tulis pesan Anda di sini…"></textarea></div>
+          <button type="submit" class="btn btn-primary btn-block">Kirim Pesan</button>
+          <p class="demo-note" style="margin-top:16px">🔒 <strong>Demo:</strong> Pesan tidak benar-benar terkirim — ini simulasi untuk portofolio.</p>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const { toast } = window.NH;
+      document.getElementById('contactPageForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('cnName').value.trim();
+        const email = document.getElementById('cnEmail').value.trim();
+        if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          toast('Mohon isi nama dan email yang valid.', 'error'); return;
+        }
+        toast('Pesan terkirim! Tim kami akan menghubungi Anda secepatnya. 📬');
+        e.target.reset();
+      });
+    });
+  </script>
+</body>
+</html>

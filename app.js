@@ -29,6 +29,14 @@
     premium: { name: 'Premium', monthly: 99000, yearly: 79000, storage: '300 GB' },
   };
 
+  // Pajak & kupon promo (dipakai di checkout)
+  const PPN_RATE = 0.11; // PPN 11%
+  const COUPONS = {
+    HEMAT10: { rate: 0.10, label: 'Diskon 10%' },
+    NEWUSER: { rate: 0.15, label: 'Diskon 15% pengguna baru' },
+    PROMO25: { rate: 0.25, label: 'Diskon 25% spesial' },
+  };
+
   /* ============ UTIL ============ */
   const $  = (s, ctx = document) => ctx.querySelector(s);
   const $$ = (s, ctx = document) => Array.from(ctx.querySelectorAll(s));
@@ -140,9 +148,11 @@
       const item = { id, owner: u.email, status: 'aktif', createdAt: now,
         expiresAt: now + (CYCLE_MS[svc.cycle] || CYCLE_MS.monthly), ...svc };
       list.push(item); store.set('nh_services', list);
-      // Catat invoice pembelian (langsung lunas)
-      Billing.add({ serviceId: id, type: 'beli', cycle: svc.cycle, amount: item.price, status: 'paid',
-        desc: `Hosting ${item.planName} (${svc.cycle === 'yearly' ? '1 tahun' : '1 bulan'})` });
+      // Catat invoice pembelian (langsung lunas). invoiceAmount = total dibayar (sudah diskon + PPN);
+      // item.price tetap harga dasar siklus agar perhitungan perpanjangan/upgrade konsisten.
+      Billing.add({ serviceId: id, type: 'beli', cycle: svc.cycle,
+        amount: (svc.invoiceAmount != null ? svc.invoiceAmount : item.price), status: 'paid',
+        desc: `Hosting ${item.planName} (${svc.cycle === 'yearly' ? '1 tahun' : '1 bulan'})` + (svc.coupon ? ` — kupon ${svc.coupon}` : '') });
       return item;
     },
     // Ubah paket (upgrade/downgrade) — kembalikan { service, diff }
@@ -302,12 +312,14 @@
         <a href="index.html#harga">Web Hosting</a>
         <a href="index.html#domain">Domain</a>
         <a href="index.html#fitur">Fitur</a>
+        <a href="status.html">Status Sistem</a>
       </div>
       <div>
         <h4>Perusahaan</h4>
         <a href="tentang.html">Tentang Kami</a>
         <a href="blog.html">Blog</a>
         <a href="bantuan.html">Pusat Bantuan</a>
+        <a href="kontak.html">Kontak</a>
       </div>
       <div>
         <h4>Akun</h4>
@@ -317,8 +329,12 @@
       </div>
     </div>
     <div class="container foot-bottom">
-      <p>© <span id="year"></span> ${BRAND}. Seluruh hak cipta dilindungi.</p>
-      <p>Website demo — dibuat untuk tujuan pembelajaran.</p>
+      <p>© <span id="year"></span> ${BRAND}. Seluruh hak cipta dilindungi. <span class="foot-demo">· Website demo untuk pembelajaran.</span></p>
+      <nav class="foot-legal" aria-label="Tautan legal">
+        <a href="syarat.html">Syarat &amp; Ketentuan</a>
+        <a href="privasi.html">Kebijakan Privasi</a>
+        <a href="kontak.html">Kontak</a>
+      </nav>
     </div>`;
   }
 
@@ -719,5 +735,5 @@
   });
 
   /* ===== Ekspor ke global agar halaman lain bisa pakai ===== */
-  window.NH = { Auth, Services, Billing, PLANS, toast, modal, rp, store, $, $$, PAGE, GOOGLE_CLIENT_ID };
+  window.NH = { Auth, Services, Billing, PLANS, COUPONS, PPN_RATE, toast, modal, rp, store, $, $$, PAGE, GOOGLE_CLIENT_ID };
 })();

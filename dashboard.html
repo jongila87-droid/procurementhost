@@ -25,6 +25,7 @@
           <a href="#ringkasan" class="active">📊 Ringkasan</a>
           <a href="#layanan">🖥️ Layanan Saya</a>
           <a href="#domain">🌐 Domain</a>
+          <a href="#penggunaan">📈 Penggunaan</a>
           <a href="#tagihan">🧾 Tagihan</a>
           <a href="#profil">👤 Profil</a>
           <a href="#keamanan">🔒 Keamanan</a>
@@ -59,6 +60,12 @@
         <section class="panel reveal" id="domain">
           <div class="panel-head"><h2>🌐 Domain</h2></div>
           <div id="domainsArea"></div>
+        </section>
+
+        <!-- Penggunaan Sumber Daya -->
+        <section class="panel reveal" id="penggunaan">
+          <div class="panel-head"><h2>📈 Penggunaan Sumber Daya</h2></div>
+          <div id="usageArea"></div>
         </section>
 
         <!-- Tagihan -->
@@ -119,6 +126,15 @@
       const cycleShort = (c) => c === 'yearly' ? 'thn' : 'bln';
       const isExpired = (s) => s.expiresAt && s.expiresAt < Date.now();
 
+      // Angka penggunaan "stabil" (deterministik dari ID, bukan acak)
+      const hashFrac = (str, salt) => {
+        let h = salt || 0;
+        for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 100000;
+        return h / 100000; // 0..1
+      };
+      const planGB = (s) => parseInt(String(s.storage || '10').replace(/[^0-9]/g, ''), 10) || 10;
+      const BW_CAP = { pemula: 100, bisnis: 500, premium: 1500 };
+
       /* ---------- RENDER ---------- */
       function render() {
         const svcs = Services.mine();
@@ -175,6 +191,34 @@
                 <td><span class="tag ${isExpired(s) ? 'tag-red' : 'tag-blue'}">${isExpired(s) ? 'Kedaluwarsa' : 'Terhubung'}</span></td>
               </tr>`).join('')}
             </tbody></table></div>`;
+        }
+
+        // --- Penggunaan sumber daya (angka deterministik dari ID) ---
+        const ua = document.getElementById('usageArea');
+        const activeSvcs = svcs.filter(s => !isExpired(s));
+        if (!activeSvcs.length) {
+          ua.innerHTML = `<div class="empty"><div class="e-ic">📈</div><p>Belum ada layanan aktif untuk dipantau.</p></div>`;
+        } else {
+          const cls = (p) => p > 95 ? 'crit' : p > 80 ? 'warn' : '';
+          ua.innerHTML = activeSvcs.map(s => {
+            const totalGB = planGB(s);
+            const usedGB = +(totalGB * (0.2 + hashFrac(s.id, 1) * 0.6)).toFixed(1);
+            const stPct = Math.min(100, Math.round(usedGB / totalGB * 100));
+            const bwCap = BW_CAP[s.plan] || 100;
+            const bwUsed = Math.round(bwCap * (0.1 + hashFrac(s.id, 7) * 0.7));
+            const bwPct = Math.min(100, Math.round(bwUsed / bwCap * 100));
+            return `<div class="usage-card">
+              <div class="usage-head"><strong>${s.planName}</strong><small>${s.id}${s.domain ? ' · ' + s.domain : ''}</small></div>
+              <div class="usage-metric">
+                <div class="um-top"><span>💾 Penyimpanan</span><span>${usedGB} / ${totalGB} GB</span></div>
+                <div class="usage-bar"><i class="${cls(stPct)}" style="width:${stPct}%"></i></div>
+              </div>
+              <div class="usage-metric">
+                <div class="um-top"><span>📶 Bandwidth (bulan ini)</span><span>${bwUsed} / ${bwCap} GB</span></div>
+                <div class="usage-bar"><i class="${cls(bwPct)}" style="width:${bwPct}%"></i></div>
+              </div>
+            </div>`;
+          }).join('');
         }
 
         // --- Banner tagihan tertunda ---

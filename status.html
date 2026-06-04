@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Status Sistem — ProcurementHost</title>
+  <meta name="description" content="Status real-time layanan ProcurementHost: hosting, panel, email, database, DNS, dan data center." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="page-head">
+    <div class="container">
+      <p class="crumb"><a href="index.html">Beranda</a> / Status Sistem</p>
+      <h1>Status Sistem 📊</h1>
+      <p>Pantau ketersediaan layanan kami secara real-time. Diperbarui otomatis setiap menit.</p>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="status-wrap">
+      <!-- Banner status keseluruhan -->
+      <div class="status-banner reveal">
+        <span class="sb-ic">✅</span>
+        <div>
+          Semua sistem beroperasi normal
+          <small id="statusUpdated">Terakhir diperbarui: —</small>
+        </div>
+      </div>
+
+      <!-- Komponen layanan -->
+      <h2 class="status-section-title">Komponen Layanan</h2>
+      <div id="componentsArea"></div>
+
+      <!-- Data center -->
+      <h2 class="status-section-title" style="margin-top:28px">Status Data Center</h2>
+      <div class="dc-list" id="dcArea"></div>
+
+      <!-- Riwayat insiden -->
+      <h2 class="status-section-title" style="margin-top:28px">Riwayat Insiden</h2>
+      <div class="incident-empty reveal">
+        ✔️ Tidak ada insiden yang dilaporkan dalam 90 hari terakhir.
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Waktu pembaruan
+      const now = new Date();
+      document.getElementById('statusUpdated').textContent =
+        'Terakhir diperbarui: ' + now.toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      // Komponen + uptime (deterministik agar konsisten)
+      const components = [
+        { name: 'Web Hosting (NVMe)', uptime: '99.99%' },
+        { name: 'Panel Pelanggan',    uptime: '100%'   },
+        { name: 'Email & Webmail',    uptime: '99.97%' },
+        { name: 'Database (MySQL)',   uptime: '99.98%' },
+        { name: 'DNS & Domain',       uptime: '100%'   },
+        { name: 'API',                uptime: '99.95%' },
+      ];
+
+      // 90 batang uptime; sebagian kecil kuning secara deterministik (tanpa acak)
+      const buildBars = (seed) => {
+        let html = '';
+        for (let i = 0; i < 90; i++) {
+          // hari "gangguan ringan" jarang: pola tetap berdasarkan seed
+          const warn = ((i * 7 + seed * 13) % 97 === 0) && i > 3;
+          html += `<i class="${warn ? 'warn' : ''}" title="Hari ke-${90 - i}"></i>`;
+        }
+        return html;
+      };
+
+      document.getElementById('componentsArea').innerHTML = components.map((c, idx) => `
+        <div class="status-card reveal">
+          <div class="status-card-head">
+            <span class="status-name">${c.name}</span>
+            <span class="status-pill"><span class="dot"></span> Operasional</span>
+          </div>
+          <div class="uptime-bars">${buildBars(idx + 1)}</div>
+          <div class="uptime-meta"><span>90 hari lalu</span><span>Uptime ${c.uptime}</span><span>Hari ini</span></div>
+        </div>`).join('');
+
+      // Data center
+      const dcs = ['Jakarta, Indonesia', 'Singapura', 'Frankfurt, Jerman', 'Oregon, AS', 'Tokyo, Jepang', 'São Paulo, Brasil'];
+      document.getElementById('dcArea').innerHTML = dcs.map(d => `
+        <div class="dc-item reveal">
+          <span>📍 ${d}</span>
+          <span class="status-pill"><span class="dot"></span> Normal</span>
+        </div>`).join('');
+    });
+  </script>
+</body>
+</html>

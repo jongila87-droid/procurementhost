@@ -66,6 +66,16 @@
         <div class="sum-row"><span>Siklus</span><span id="sCycle">Bulanan</span></div>
         <div class="sum-row"><span>Penyimpanan</span><span id="sStorage">–</span></div>
         <div class="sum-row"><span>Domain</span><span id="sDomain">—</span></div>
+
+        <div class="coupon-box">
+          <input type="text" id="couponInput" placeholder="Kode kupon (mis. HEMAT10)" autocomplete="off" aria-label="Kode kupon" />
+          <button type="button" class="btn btn-outline btn-sm" id="couponBtn">Terapkan</button>
+        </div>
+        <p class="coupon-msg" id="couponMsg" role="status" aria-live="polite"></p>
+
+        <div class="sum-row"><span>Subtotal</span><span id="sSubtotal">Rp0</span></div>
+        <div class="sum-row sum-discount" id="sDiscountRow" style="display:none"><span id="sDiscountLabel">Diskon</span><span id="sDiscount">−Rp0</span></div>
+        <div class="sum-row"><span>PPN 11%</span><span id="sPpn">Rp0</span></div>
         <div class="sum-total"><span>Total</span><span id="sTotal">Rp0</span></div>
         <button class="btn btn-primary btn-block" id="payBtn" style="margin-top:18px">Bayar Sekarang</button>
         <p style="text-align:center;color:var(--muted);font-size:.82rem;margin-top:12px">💯 Garansi uang kembali 30 hari</p>
@@ -77,10 +87,11 @@
   <script src="app.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const { Auth, Services, PLANS, toast, rp } = window.NH;
+      const { Auth, Services, PLANS, COUPONS, PPN_RATE, toast, rp } = window.NH;
       const params = new URLSearchParams(location.search);
       let planKey = params.get('plan'); if (!PLANS[planKey]) planKey = 'bisnis';
       let cycle = 'monthly';
+      let appliedCoupon = null;
 
       // isi dropdown paket
       const sel = document.getElementById('planSelect');
@@ -93,6 +104,16 @@
 
       function price() { return cycle === 'yearly' ? PLANS[planKey].yearly * 12 : PLANS[planKey].monthly; }
 
+      // Hitung subtotal → diskon → PPN → total
+      function calc() {
+        const subtotal = price();
+        const rate = appliedCoupon ? COUPONS[appliedCoupon].rate : 0;
+        const discount = Math.round(subtotal * rate);
+        const afterDisc = subtotal - discount;
+        const ppn = Math.round(afterDisc * PPN_RATE);
+        return { subtotal, discount, ppn, total: afterDisc + ppn };
+      }
+
       function refresh() {
         const p = PLANS[planKey];
         document.getElementById('cycMonthly').textContent = rp(p.monthly) + '/bln';
@@ -102,9 +123,42 @@
         document.getElementById('sStorage').textContent = p.storage;
         const dom = document.getElementById('domain').value.trim();
         document.getElementById('sDomain').textContent = dom || '—';
-        document.getElementById('sTotal').textContent = rp(price());
+
+        const { subtotal, discount, ppn, total } = calc();
+        document.getElementById('sSubtotal').textContent = rp(subtotal);
+        document.getElementById('sPpn').textContent = rp(ppn);
+        document.getElementById('sTotal').textContent = rp(total);
+        const dRow = document.getElementById('sDiscountRow');
+        if (discount > 0) {
+          dRow.style.display = '';
+          document.getElementById('sDiscountLabel').textContent = `Diskon (${COUPONS[appliedCoupon].label})`;
+          document.getElementById('sDiscount').textContent = '−' + rp(discount);
+        } else {
+          dRow.style.display = 'none';
+        }
       }
       refresh();
+
+      // Terapkan kupon
+      function applyCoupon() {
+        const code = document.getElementById('couponInput').value.trim().toUpperCase();
+        const msg = document.getElementById('couponMsg');
+        if (!code) { appliedCoupon = null; msg.textContent = ''; msg.className = 'coupon-msg'; refresh(); return; }
+        if (COUPONS[code]) {
+          appliedCoupon = code;
+          msg.textContent = `✓ Kupon "${code}" diterapkan — ${COUPONS[code].label}.`;
+          msg.className = 'coupon-msg ok';
+        } else {
+          appliedCoupon = null;
+          msg.textContent = '✕ Kode kupon tidak valid. Coba: HEMAT10, NEWUSER, atau PROMO25.';
+          msg.className = 'coupon-msg no';
+        }
+        refresh();
+      }
+      document.getElementById('couponBtn').addEventListener('click', applyCoupon);
+      document.getElementById('couponInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); applyCoupon(); }
+      });
 
       sel.addEventListener('change', () => { planKey = sel.value; refresh(); });
       document.getElementById('domain').addEventListener('input', refresh);
@@ -126,11 +180,14 @@
           return;
         }
         const p = PLANS[planKey];
+        const { total } = calc();
         Services.add({
           planName: p.name,
           plan: planKey,
           cycle,
-          price: price(),
+          price: price(),          // harga dasar siklus (untuk perpanjangan/upgrade)
+          invoiceAmount: total,    // total dibayar (diskon + PPN) untuk invoice
+          coupon: appliedCoupon,
           domain: document.getElementById('domain').value.trim(),
           storage: p.storage,
         });
