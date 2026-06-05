@@ -114,6 +114,17 @@
     .cant { display: block; text-align: center; margin: 22px 0 14px; font-size: .95rem; }
     .signup-line { text-align: center; color: #6b7185; font-size: .95rem; }
 
+    /* Pemulihan Akun */
+    .rec-sub { text-align: center; color: #8a8fa6; font-size: .92rem; margin: -8px 0 20px; }
+    .rec-opts { display: flex; flex-direction: column; gap: 8px; background: #f3f4fb; border: 1px solid #e6e8f2; border-radius: 12px; padding: 12px; margin-bottom: 18px; }
+    .rec-opt { display: flex; align-items: center; gap: 10px; font-size: .92rem; color: #2a2550; cursor: pointer; padding: 8px; border-radius: 8px; transition: background .15s; }
+    .rec-opt:hover { background: #fff; }
+    .rec-opt input { accent-color: #6d28d9; width: 17px; height: 17px; flex-shrink: 0; }
+    .rec-hint { display: block; color: #8a8fa6; font-size: .82rem; margin-top: 7px; line-height: 1.45; }
+    [data-theme="dark"] .rec-opts { background: var(--bg-soft); border-color: var(--line); }
+    [data-theme="dark"] .rec-opt { color: var(--ink); }
+    [data-theme="dark"] .rec-opt:hover { background: var(--card); }
+
     /* Dark mode menyesuaikan */
     [data-theme="dark"] .login-card { background: var(--card); border-color: var(--line); }
     [data-theme="dark"] .login-title { color: #e8edf5; }
@@ -142,6 +153,7 @@
 
   <main class="login-page">
     <div class="login-card reveal">
+      <div id="loginView">
       <h1 class="login-title">Login</h1>
 
       <!-- Tab brand: Procurement | Host -->
@@ -182,6 +194,25 @@
 
       <a href="#" class="link-purple cant" id="cantLink">Tidak bisa akses akun?</a>
       <p class="signup-line">Belum punya akun? <a href="daftar.html" class="link-purple">Daftar</a></p>
+      </div><!-- /loginView -->
+
+      <!-- Pemulihan Akun (muncul saat klik "Tidak bisa akses akun?") -->
+      <div id="recoveryView" hidden>
+        <h1 class="login-title">Pemulihan Akun</h1>
+        <p class="rec-sub">Pilih kendala yang Anda alami, lalu masukkan email akun untuk memulai pemulihan.</p>
+        <div class="rec-opts" role="radiogroup" aria-label="Jenis kendala">
+          <label class="rec-opt"><input type="radio" name="recType" value="2fa" checked /> <span>Kehilangan Autentikasi Dua-Faktor (2FA)</span></label>
+          <label class="rec-opt"><input type="radio" name="recType" value="email" /> <span>Kehilangan Akses ke Email</span></label>
+          <label class="rec-opt"><input type="radio" name="recType" value="lupa-email" /> <span>Lupa Email</span></label>
+        </div>
+        <div class="lf" id="rec-femail">
+          <label for="recEmail">Email Akun</label>
+          <input type="email" id="recEmail" autocomplete="email" placeholder="email@anda.com" />
+          <span class="rec-hint">Masukkan email yang terkait dengan akun Anda. Pastikan email ini benar dan Anda memiliki aksesnya.</span>
+        </div>
+        <button type="button" class="login-submit" id="recSubmit">Mulai Pemulihan Akun</button>
+        <a href="#" class="link-purple cant" id="backToLogin">← Kembali ke form login</a>
+      </div>
     </div>
   </main>
 
@@ -254,9 +285,35 @@
         const typed = document.getElementById('email').value.trim();
         location.href = 'lupa-password.html' + (typed ? '?email=' + encodeURIComponent(typed) : '');
       });
+      // --- Pemulihan Akun (tampilkan form recovery) ---
+      const loginView = document.getElementById('loginView');
+      const recoveryView = document.getElementById('recoveryView');
+      const showRecovery = (on) => { loginView.hidden = on; recoveryView.hidden = !on; };
+
       document.getElementById('cantLink').addEventListener('click', (e) => {
         e.preventDefault();
-        toast('Hubungi dukungan via WhatsApp atau Pusat Bantuan untuk pemulihan akun.', 'info');
+        // bawa email yang sudah diketik (kalau ada)
+        const typed = document.getElementById('email').value.trim();
+        if (typed) document.getElementById('recEmail').value = typed;
+        showRecovery(true);
+      });
+      document.getElementById('backToLogin').addEventListener('click', (e) => {
+        e.preventDefault();
+        showRecovery(false);
+      });
+      document.getElementById('recSubmit').addEventListener('click', () => {
+        const email = document.getElementById('recEmail').value.trim();
+        const fEmail = document.getElementById('rec-femail');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          fEmail.classList.add('invalid');
+          toast('Masukkan email akun yang valid.', 'error');
+          return;
+        }
+        fEmail.classList.remove('invalid');
+        const type = document.querySelector('input[name="recType"]:checked').value;
+        const label = { '2fa': 'Autentikasi 2FA', 'email': 'akses email', 'lupa-email': 'email akun' }[type];
+        toast(`Permintaan pemulihan (${label}) terkirim untuk ${email}. Tim kami akan menghubungi Anda dalam 1×24 jam untuk verifikasi identitas. ✅`);
+        setTimeout(() => { document.getElementById('recEmail').value = ''; showRecovery(false); }, 1500);
       });
 
       // --- Proses Login ---
