@@ -42,6 +42,7 @@
           <a href="#domain">🌐 Domain</a>
           <a href="#penggunaan">📈 Penggunaan</a>
           <a href="#tagihan">🧾 Tagihan</a>
+          <a href="#tiket">🎫 Tiket</a>
           <a href="#profil">👤 Profil</a>
           <a href="#keamanan">🔒 Keamanan</a>
           <a href="index.html#harga">➕ Pesan Baru</a>
@@ -90,6 +91,15 @@
           <div id="invoicesArea"></div>
         </section>
 
+        <!-- Tiket -->
+        <section class="panel reveal" id="tiket">
+          <div class="panel-head">
+            <h2>🎫 Tiket Dukungan</h2>
+            <a href="bantuan.html" class="btn btn-primary btn-xs">+ Tiket Baru</a>
+          </div>
+          <div id="ticketsArea"></div>
+        </section>
+
         <!-- Profil -->
         <section class="panel reveal" id="profil">
           <div class="panel-head"><h2>👤 Profil Saya</h2></div>
@@ -121,7 +131,7 @@
   <script src="app.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const { Auth, Services, Billing, PLANS, toast, modal, rp, store } = window.NH;
+      const { Auth, Services, Billing, Tickets, PLANS, toast, modal, rp, store } = window.NH;
       const user = Auth.require();          // wajib login
       if (!user) return;
 
@@ -271,6 +281,25 @@
             </tbody></table></div>`;
         }
 
+        // --- Tiket ---
+        const ta = document.getElementById('ticketsArea');
+        const tks = Tickets.mine().slice().sort((a, b) => b.createdAt - a.createdAt);
+        if (!tks.length) {
+          ta.innerHTML = `<div class="empty"><div class="e-ic">🎫</div><p>Belum ada tiket. <a href="bantuan.html" style="color:var(--indigo);font-weight:600">Buat tiket pertama →</a></p></div>`;
+        } else {
+          ta.innerHTML = `<div class="table-wrap"><table class="table">
+            <thead><tr><th>ID</th><th>Subjek</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead>
+            <tbody>${tks.map(t => `
+              <tr>
+                <td>${t.id}</td>
+                <td>${t.subject}</td>
+                <td>${fmtDate(t.createdAt)}</td>
+                <td><span class="tag ${t.status === 'open' ? 'tag-amber' : 'tag-green'}">${t.status === 'open' ? 'Terbuka' : 'Selesai'}</span></td>
+                <td><button class="btn btn-outline btn-xs" data-action="ticket" data-id="${t.id}">Lihat</button></td>
+              </tr>`).join('')}
+            </tbody></table></div>`;
+        }
+
         // --- Keamanan (ganti password) ---
         const se = document.getElementById('securityArea');
         if (user.provider === 'google') {
@@ -366,6 +395,32 @@
         });
       }
 
+      /* ---------- MODAL: Lihat / balas tiket ---------- */
+      function openTicket(id) {
+        const t = Tickets.get(id); if (!t) return;
+        const fmtT = (ts) => new Date(ts).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+        const thread = t.replies.map(r =>
+          `<div class="tk-msg ${r.from}"><span class="tk-who">${r.from === 'user' ? 'Anda' : 'Tim Dukungan'} · ${fmtT(r.at)}</span>${r.text.replace(/</g, '&lt;')}</div>`).join('');
+        const closed = t.status === 'closed';
+        const { root } = modal({
+          title: `${t.id} · ${t.subject}`,
+          body: `<div class="ticket-thread">${thread}</div>` +
+            (closed ? '<p style="margin:0;color:var(--muted)">✔️ Tiket ini sudah ditutup.</p>'
+                    : `<div class="field" style="margin-bottom:0"><textarea id="tkReply" rows="2" placeholder="Tulis balasan…"></textarea></div>`),
+          actions: closed
+            ? [{ label: 'Tutup', variant: 'btn-outline' }]
+            : [
+                { label: 'Tutup Tiket', variant: 'btn-danger', onClick: (close) => { Tickets.close(id); toast('Tiket ditutup.', 'info'); close(); render(); } },
+                { label: 'Kirim Balasan', variant: 'btn-primary', onClick: (close) => {
+                    const txt = root.querySelector('#tkReply').value.trim();
+                    if (!txt) { toast('Tulis balasan dulu.', 'error'); return; }
+                    Tickets.reply(id, txt); toast('Balasan terkirim. ✅');
+                    close(); render(); openTicket(id);
+                }},
+              ],
+        });
+      }
+
       /* ---------- DELEGASI: klik tombol aksi (layanan & tagihan) ---------- */
       document.querySelector('.dash-main').addEventListener('click', (e) => {
         const btn = e.target.closest('[data-action]'); if (!btn) return;
@@ -373,6 +428,7 @@
         if (btn.dataset.action === 'upgrade') openUpgrade(id);
         else if (btn.dataset.action === 'renew') openRenew(id);
         else if (btn.dataset.action === 'pay') openPay(id);
+        else if (btn.dataset.action === 'ticket') openTicket(id);
         else if (btn.dataset.action === 'del') {
           modal({
             title: 'Hapus Layanan?',
@@ -416,7 +472,7 @@
       // Reset data demo
       document.getElementById('resetData').addEventListener('click', () => {
         if (!confirm('Hapus SEMUA data demo (akun, layanan, tagihan, sesi)? Tindakan ini tidak bisa dibatalkan.')) return;
-        ['nh_users','nh_session','nh_services','nh_invoices','nh_invseq'].forEach(store.del);
+        ['nh_users','nh_session','nh_services','nh_invoices','nh_invseq','nh_cart','nh_tickets','nh_ticketseq'].forEach(store.del);
         toast('Semua data demo dihapus.', 'info');
         setTimeout(() => location.href = 'index.html', 900);
       });

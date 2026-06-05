@@ -80,7 +80,7 @@
   <script src="app.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const { toast } = window.NH;
+      const { toast, Auth, Tickets } = window.NH;
       // FAQ accordion
       document.querySelectorAll('.faq-item').forEach(item => {
         item.querySelector('.faq-q').addEventListener('click', () => {
@@ -89,15 +89,29 @@
           a.style.maxHeight = open ? a.scrollHeight + 'px' : null;
         });
       });
+      // Prefill nama & email bila sudah login
+      const cur = Auth.current();
+      if (cur) {
+        document.getElementById('tName').value = cur.name;
+        document.getElementById('tEmail').value = cur.email;
+      }
       // Form tiket
       document.getElementById('ticketForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const name = document.getElementById('tName').value.trim();
         const email = document.getElementById('tEmail').value.trim();
+        const topic = document.getElementById('tTopic').value;
+        const msg = document.getElementById('tMsg').value.trim();
         if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
           toast('Mohon isi nama dan email yang valid.', 'error'); return;
         }
-        toast('Tiket terkirim! Tim kami akan membalas < 5 menit. 🎫');
+        if (!msg) { toast('Mohon tuliskan pesan Anda.', 'error'); return; }
+        if (Auth.current()) {
+          const t = Tickets.add({ subject: topic, topic, message: msg });
+          toast(`Tiket ${t.id} dibuat! Pantau & balas di Dashboard → Tiket. 🎫`);
+        } else {
+          toast('Tiket terkirim! Untuk memantau balasan, silakan masuk/daftar dulu. 🎫', 'info');
+        }
         e.target.reset();
       });
     });
