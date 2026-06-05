@@ -24,9 +24,17 @@
 
   // Daftar paket — sumber data tunggal, dipakai checkout & dashboard
   const PLANS = {
-    pemula:  { name: 'Pemula',  monthly: 15000, yearly: 12000, storage: '10 GB' },
-    bisnis:  { name: 'Bisnis',  monthly: 45000, yearly: 36000, storage: '100 GB' },
-    premium: { name: 'Premium', monthly: 99000, yearly: 79000, storage: '300 GB' },
+    pemula:  { name: 'Pemula',  monthly: 15000, yearly: 12000, storage: '10 GB',  category: 'hosting' },
+    bisnis:  { name: 'Bisnis',  monthly: 45000, yearly: 36000, storage: '100 GB', category: 'hosting' },
+    premium: { name: 'Premium', monthly: 99000, yearly: 79000, storage: '300 GB', category: 'hosting' },
+    // VPS / Cloud — paket berjenjang dengan sumber daya khusus
+    'vps-starter': { name: 'VPS Starter', monthly: 120000, yearly: 100000, storage: '50 GB SSD',  category: 'vps', vcpu: '2 vCPU', ram: '2 GB RAM' },
+    'vps-pro':     { name: 'VPS Pro',     monthly: 280000, yearly: 235000, storage: '120 GB SSD', category: 'vps', vcpu: '4 vCPU', ram: '8 GB RAM' },
+    'vps-max':     { name: 'VPS Max',     monthly: 550000, yearly: 460000, storage: '250 GB SSD', category: 'vps', vcpu: '8 vCPU', ram: '16 GB RAM' },
+    // Dedicated Server — server fisik sepenuhnya milik sendiri
+    'ded-entry':      { name: 'Dedicated Entry',      monthly: 1500000, yearly: 1300000, storage: '1 TB NVMe', category: 'dedicated', cpu: 'Xeon 4 Core', ram: '16 GB RAM' },
+    'ded-power':      { name: 'Dedicated Power',      monthly: 2900000, yearly: 2500000, storage: '2 TB NVMe', category: 'dedicated', cpu: 'Xeon 8 Core', ram: '32 GB RAM' },
+    'ded-enterprise': { name: 'Dedicated Enterprise', monthly: 5500000, yearly: 4800000, storage: '4 TB NVMe', category: 'dedicated', cpu: 'Xeon 16 Core', ram: '64 GB RAM' },
   };
 
   // Pajak & kupon promo (dipakai di checkout)
@@ -238,6 +246,7 @@
       { label: 'Beranda', href: 'index.html', match: 'index.html' },
       { label: 'Fitur',   href: 'index.html#fitur' },
       { label: 'Harga',   href: 'index.html#harga' },
+      { label: 'VPS',     href: 'vps.html',     match: 'vps.html' },
       { label: 'Blog',    href: 'blog.html',    match: 'blog.html|artikel.html' },
       { label: 'Tentang', href: 'tentang.html', match: 'tentang.html' },
       { label: 'Bantuan', href: 'bantuan.html', match: 'bantuan.html' },
@@ -310,6 +319,8 @@
       <div>
         <h4>Produk</h4>
         <a href="index.html#harga">Web Hosting</a>
+        <a href="vps.html">VPS &amp; Cloud</a>
+        <a href="dedicated.html">Dedicated Server</a>
         <a href="index.html#domain">Domain</a>
         <a href="index.html#fitur">Fitur</a>
         <a href="status.html">Status Sistem</a>
@@ -320,6 +331,7 @@
         <a href="blog.html">Blog</a>
         <a href="bantuan.html">Pusat Bantuan</a>
         <a href="kontak.html">Kontak</a>
+        <a href="afiliasi.html">Program Afiliasi</a>
       </div>
       <div>
         <h4>Akun</h4>

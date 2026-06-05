@@ -738,3 +738,19 @@ body { top: 0 !important; }
 .usage-bar i { display: block; height: 100%; width: 0; background: var(--bg-grad); border-radius: 99px; transition: width .8s ease; }
 .usage-bar i.warn { background: linear-gradient(90deg, #f59e0b, #f97316); }
 .usage-bar i.crit { background: linear-gradient(90deg, #ef4444, #dc2626); }
+
+/* ---------- TABEL PERBANDINGAN (VPS) ---------- */
+.compare-wrap { overflow-x: auto; }
+.compare-table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; min-width: 560px; }
+.compare-table th, .compare-table td { padding: 14px 18px; text-align: center; border-bottom: 1px solid var(--line); font-size: .95rem; }
+.compare-table th:first-child, .compare-table td:first-child { text-align: left; font-weight: 600; color: var(--ink); }
+.compare-table thead th { background: var(--bg-soft); font-family: 'Poppins', sans-serif; font-weight: 700; }
+.compare-table thead th.pop { color: var(--indigo); }
+.compare-table tbody tr:last-child td { border-bottom: 0; }
+.compare-table td { color: var(--slate); }
+.compare-table .yes { color: #16a34a; font-weight: 700; }
+.compare-table .no { color: var(--muted); }
+
+/* Spesifikasi kecil di kartu VPS */
+.vps-spec { display: flex; gap: 8px; flex-wrap: wrap; margin: -8px 0 18px; }
+.vps-spec span { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; font-size: .8rem; font-weight: 600; color: var(--slate); }

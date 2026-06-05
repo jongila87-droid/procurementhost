@@ -132,8 +132,14 @@
         for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 100000;
         return h / 100000; // 0..1
       };
-      const planGB = (s) => parseInt(String(s.storage || '10').replace(/[^0-9]/g, ''), 10) || 10;
-      const BW_CAP = { pemula: 100, bisnis: 500, premium: 1500 };
+      const planGB = (s) => {
+        const str = String(s.storage || '10');
+        const n = parseFloat(str.replace(/[^0-9.]/g, '')) || 10;
+        return /tb/i.test(str) ? n * 1000 : n; // "1 TB" → 1000 GB
+      };
+      const BW_CAP = { pemula: 100, bisnis: 500, premium: 1500,
+        'vps-starter': 1000, 'vps-pro': 3000, 'vps-max': 6000,
+        'ded-entry': 10000, 'ded-power': 20000, 'ded-enterprise': 50000 };
 
       /* ---------- RENDER ---------- */
       function render() {
