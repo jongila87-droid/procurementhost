@@ -349,10 +349,16 @@ img { max-width: 100%; display: block; }
 
 /* ---------- Header tweaks (theme btn, auth) ---------- */
 .header { background: var(--header-bg); }
-/* Header full-width: logo menempel ke kiri, menu & aksi ke kanan (tidak berdempetan dgn Beranda) */
-.header .nav { max-width: none; padding-left: 40px; padding-right: 40px; gap: 24px; }
-.header .logo { margin-right: 12px; }
-@media (max-width: 760px) { .header .nav { padding-left: 20px; padding-right: 20px; } }
+/* Header full-width 3 zona: logo kiri — menu rapi di tengah — aksi kanan */
+.header .nav { max-width: none; padding-left: 40px; padding-right: 40px; gap: 20px; }
+.header .nav-links { flex: 1; gap: 18px; }
+.nav-menu { flex: 1; display: flex; align-items: center; justify-content: center; gap: 34px; }
+.nav-actions { display: flex; align-items: center; gap: 18px; flex-shrink: 0; }
+@media (max-width: 760px) {
+  .header .nav { padding-left: 20px; padding-right: 20px; }
+  .header .nav-links { flex: initial; }
+  .nav-menu, .nav-actions { display: contents; }
+}
 .theme-btn { background: none; border: 0; font-size: 1.1rem; cursor: pointer; padding: 6px; border-radius: 8px; line-height: 1; transition: background .2s; }
 .theme-btn:hover { background: rgba(99,102,241,.12); }
 .nav-auth { display: flex; align-items: center; gap: 14px; }
