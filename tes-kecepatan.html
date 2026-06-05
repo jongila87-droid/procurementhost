@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tes Kecepatan Website — ProcurementHost</title>
+  <meta name="description" content="Cek skor kecepatan website Anda secara gratis dan dapatkan saran optimasi." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Open Graph / Social preview (disuntik otomatis) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="ProcurementHost" />
+  <meta property="og:title" content="Tes Kecepatan Website — ProcurementHost" />
+  <meta property="og:description" content="Cek skor kecepatan website Anda secara gratis dan dapatkan saran optimasi." />
+  <meta property="og:url" content="https://procurementhost.netlify.app/tes-kecepatan.html" />
+  <meta property="og:image" content="https://procurementhost.netlify.app/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Tes Kecepatan Website — ProcurementHost" />
+  <meta name="twitter:description" content="Cek skor kecepatan website Anda secara gratis dan dapatkan saran optimasi." />
+  <meta name="twitter:image" content="https://procurementhost.netlify.app/og-image.png" />
+  <link rel="canonical" href="https://procurementhost.netlify.app/tes-kecepatan.html" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="page-head">
+    <div class="container">
+      <p class="crumb"><a href="index.html">Beranda</a> / Tes Kecepatan</p>
+      <h1>Tes Kecepatan Website ⚡</h1>
+      <p>Masukkan alamat website untuk melihat skor performa &amp; saran perbaikan. Gratis!</p>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="speed-box">
+      <form class="speed-form" id="speedForm" autocomplete="off">
+        <input type="text" id="speedUrl" placeholder="cth: tokosaya.com" aria-label="Alamat website" />
+        <button type="submit" class="btn btn-primary" id="speedBtn">Tes Sekarang</button>
+      </form>
+
+      <div class="speed-prog" id="speedProg" hidden><i id="speedProgBar"></i></div>
+
+      <div id="speedResult" hidden>
+        <div class="speed-gauge">
+          <div class="speed-score" id="sScore">0</div>
+          <div class="speed-grade" id="sGrade">—</div>
+          <p style="color:var(--muted);margin-top:6px;font-size:.9rem">Skor untuk <strong id="sTarget"></strong></p>
+        </div>
+        <div class="speed-metrics">
+          <div class="speed-metric"><div class="sm-num" id="sLoad">0s</div><div class="sm-lbl">⏱️ Waktu muat</div></div>
+          <div class="speed-metric"><div class="sm-num" id="sSize">0 MB</div><div class="sm-lbl">📦 Ukuran halaman</div></div>
+          <div class="speed-metric"><div class="sm-num" id="sReq">0</div><div class="sm-lbl">🔗 Jumlah request</div></div>
+        </div>
+
+        <div class="panel" style="margin-top:26px">
+          <div class="panel-head"><h2 style="font-size:1.1rem">💡 Saran Optimasi</h2></div>
+          <ul class="bullets" id="sTips" style="margin:0 0 0 20px;color:var(--slate)"></ul>
+        </div>
+
+        <div class="cta" style="border-radius:var(--radius);margin-top:26px">
+          <div class="cta-inner" style="padding:8px">
+            <h2 style="font-size:1.5rem">Mau website secepat kilat?</h2>
+            <p style="margin:10px 0 18px">Pindah ke hosting NVMe ProcurementHost — gratis migrasi, tanpa downtime.</p>
+            <a href="index.html#harga" class="btn btn-light">Lihat Paket Hosting</a>
+          </div>
+        </div>
+      </div>
+
+      <p class="demo-note" style="max-width:680px;margin:26px auto 0">🔒 <strong>Demo:</strong> Skor ini simulasi untuk portofolio (tidak benar-benar memindai website). Pada produk asli, kami memakai data pengukuran nyata.</p>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const { toast } = window.NH;
+      const hash = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 100000; return h; };
+      const frac = (s, salt) => ((hash(s) + salt * 7919) % 100000) / 100000;
+
+      const form = document.getElementById('speedForm');
+      const prog = document.getElementById('speedProg');
+      const bar = document.getElementById('speedProgBar');
+      const result = document.getElementById('speedResult');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let url = document.getElementById('speedUrl').value.trim();
+        if (!url || !url.includes('.')) { toast('Masukkan alamat website yang valid, mis. tokosaya.com', 'error'); return; }
+        url = url.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+
+        // mulai animasi progress
+        result.hidden = true;
+        prog.hidden = false;
+        bar.style.width = '0%';
+        document.getElementById('speedBtn').disabled = true;
+        let p = 0;
+        const timer = setInterval(() => {
+          p = Math.min(100, p + (6 + Math.round(frac(url, p) * 8)));
+          bar.style.width = p + '%';
+          if (p >= 100) { clearInterval(timer); setTimeout(() => showResult(url), 250); }
+        }, 90);
+      });
+
+      function showResult(url) {
+        const score = Math.round(62 + frac(url, 1) * 36);     // 62–98
+        const load = (0.4 + frac(url, 2) * 3.1).toFixed(2);   // 0.4–3.5 s
+        const size = (0.5 + frac(url, 3) * 3.5).toFixed(1);   // 0.5–4.0 MB
+        const req = Math.round(20 + frac(url, 4) * 70);       // 20–90
+
+        const grade = score >= 90 ? ['Sangat Cepat 🚀', 's-good']
+                    : score >= 75 ? ['Cukup Baik 👍', 's-mid']
+                    : ['Perlu Optimasi ⚠️', 's-bad'];
+
+        const sc = document.getElementById('sScore');
+        sc.className = 'speed-score ' + grade[1];
+        document.getElementById('sGrade').className = 'speed-grade ' + grade[1];
+        document.getElementById('sGrade').textContent = grade[0];
+        document.getElementById('sTarget').textContent = url;
+        document.getElementById('sLoad').textContent = load + 's';
+        document.getElementById('sSize').textContent = size + ' MB';
+        document.getElementById('sReq').textContent = req;
+
+        const tips = [];
+        if (load > 2) tips.push('Waktu muat masih tinggi — pertimbangkan server NVMe & caching.');
+        if (size > 2) tips.push('Ukuran halaman besar — kompres gambar & aktifkan minify CSS/JS.');
+        if (req > 60) tips.push('Banyak request — gabungkan file & gunakan CDN.');
+        tips.push('Aktifkan kompresi GZIP/Brotli untuk mempercepat transfer.');
+        tips.push('Gunakan SSL & HTTP/2 untuk koneksi lebih efisien.');
+        document.getElementById('sTips').innerHTML = tips.map(t => `<li style="list-style:disc;margin-bottom:8px">${t}</li>`).join('');
+
+        prog.hidden = true;
+        result.hidden = false;
+        document.getElementById('speedBtn').disabled = false;
+
+        // animasi angka skor
+        let cur = 0;
+        const step = () => { cur += Math.ceil((score - cur) / 6) || 1; if (cur >= score) cur = score; sc.textContent = cur; if (cur < score) requestAnimationFrame(step); };
+        requestAnimationFrame(step);
+        result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  </script>
+</body>
+</html>

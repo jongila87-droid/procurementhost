@@ -238,6 +238,48 @@
     },
   };
 
+  /* ===== Keranjang belanja (multi-item) ===== */
+  const cartChanged = () => { try { window.dispatchEvent(new Event('nh-cart-change')); } catch {} };
+  const Cart = {
+    items: () => store.get('nh_cart', []),
+    count: () => Cart.items().length,
+    add(planKey, cycle = 'monthly', domain = '') {
+      if (!PLANS[planKey]) return null;
+      const items = Cart.items();
+      items.push({ plan: planKey, cycle, domain });
+      store.set('nh_cart', items); cartChanged();
+      return items;
+    },
+    setCycle(idx, cycle) { const it = Cart.items(); if (it[idx]) { it[idx].cycle = cycle; store.set('nh_cart', it); cartChanged(); } },
+    remove(idx) { const it = Cart.items(); it.splice(idx, 1); store.set('nh_cart', it); cartChanged(); },
+    clear() { store.del('nh_cart'); cartChanged(); },
+  };
+
+  /* ===== Tiket dukungan ===== */
+  const SUPPORT_AUTOREPLY = 'Halo! 👋 Terima kasih sudah menghubungi kami. Tim dukungan akan meninjau tiket Anda dan membalas dalam waktu kurang dari 1×24 jam.';
+  const Tickets = {
+    all:  () => store.get('nh_tickets', []),
+    mine: () => { const u = Auth.current(); return u ? Tickets.all().filter(t => t.owner === u.email) : []; },
+    get:  (id) => Tickets.all().find(t => t.id === id) || null,
+    add({ subject, topic, message }) {
+      const u = Auth.current(); if (!u) return null;
+      const list = Tickets.all();
+      const seq = store.get('nh_ticketseq', 1000) + 1;
+      store.set('nh_ticketseq', seq);
+      const now = Date.now();
+      const t = { id: 'TKT-' + seq, owner: u.email, subject, topic, status: 'open', createdAt: now,
+        replies: [ { from: 'user', text: message, at: now }, { from: 'support', text: SUPPORT_AUTOREPLY, at: now + 1000 } ] };
+      list.push(t); store.set('nh_tickets', list);
+      return t;
+    },
+    reply(id, text) {
+      const list = Tickets.all(); const t = list.find(x => x.id === id); if (!t) return null;
+      t.replies.push({ from: 'user', text, at: Date.now() }); t.status = 'open';
+      store.set('nh_tickets', list); return t;
+    },
+    close(id) { const list = Tickets.all(); const t = list.find(x => x.id === id); if (t) { t.status = 'closed'; store.set('nh_tickets', list); } },
+  };
+
   /* =====================================================================
      2. HEADER & FOOTER OTOMATIS
      ===================================================================== */
@@ -274,6 +316,9 @@
       <nav class="nav-links" id="navLinks" aria-label="Navigasi utama">
         ${navItems}
         <button class="theme-btn" id="themeBtn" aria-label="Ganti mode gelap/terang" title="Mode gelap/terang">🌙</button>
+        <a href="keranjang.html" class="cart-link" id="cartLink" aria-label="Keranjang belanja" title="Keranjang">
+          🛒<span class="cart-badge" id="cartBadge" hidden>0</span>
+        </a>
         <span class="nav-auth" id="navAuth"></span>
         <span class="lang-switch notranslate" id="langSwitch" translate="no">
           <button class="lang-btn" id="langBtn" aria-label="Pilih bahasa" aria-haspopup="true" aria-expanded="false">
@@ -323,6 +368,7 @@
         <a href="dedicated.html">Dedicated Server</a>
         <a href="index.html#domain">Domain</a>
         <a href="index.html#fitur">Fitur</a>
+        <a href="tes-kecepatan.html">Tes Kecepatan</a>
         <a href="status.html">Status Sistem</a>
       </div>
       <div>
@@ -357,6 +403,29 @@
   }
 
   /* ===== Navbar: tampilkan status login ===== */
+  // Perbarui badge jumlah item di keranjang (dipanggil saat load & setelah ubah keranjang)
+  function renderCart() {
+    const badge = $('#cartBadge'); if (!badge) return;
+    const n = Cart.count();
+    badge.textContent = n;
+    badge.hidden = n === 0;
+  }
+  window.addEventListener('nh-cart-change', renderCart);
+
+  // Tombol "Tambah ke Keranjang" di halaman mana pun: <button data-cart-add="vps-pro" data-cart-cycle="monthly">
+  function initCartButtons() {
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-cart-add]');
+      if (!btn) return;
+      e.preventDefault();
+      const plan = btn.getAttribute('data-cart-add');
+      const cycle = btn.getAttribute('data-cart-cycle') || 'monthly';
+      if (!PLANS[plan]) return;
+      Cart.add(plan, cycle);
+      toast(`${PLANS[plan].name} ditambahkan ke keranjang. 🛒`);
+    });
+  }
+
   function renderNavAuth() {
     const el = $('#navAuth'); if (!el) return;
     const u = Auth.current();
@@ -751,6 +820,8 @@
   document.addEventListener('DOMContentLoaded', () => {
     renderChrome();
     renderNavAuth();
+    renderCart();
+    initCartButtons();
     initLang();
     wireNav();
     wireReveal();
@@ -759,5 +830,5 @@
   });
 
   /* ===== Ekspor ke global agar halaman lain bisa pakai ===== */
-  window.NH = { Auth, Services, Billing, PLANS, COUPONS, PPN_RATE, toast, modal, rp, store, $, $$, PAGE, GOOGLE_CLIENT_ID };
+  window.NH = { Auth, Services, Billing, Cart, Tickets, PLANS, COUPONS, PPN_RATE, toast, modal, rp, store, $, $$, PAGE, GOOGLE_CLIENT_ID };
 })();

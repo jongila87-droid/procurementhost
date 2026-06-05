@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keranjang — ProcurementHost</title>
+  <meta name="description" content="Keranjang belanja ProcurementHost — pesan beberapa paket sekaligus." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Open Graph / Social preview (disuntik otomatis) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="ProcurementHost" />
+  <meta property="og:title" content="Keranjang — ProcurementHost" />
+  <meta property="og:description" content="Keranjang belanja ProcurementHost — pesan beberapa paket sekaligus." />
+  <meta property="og:url" content="https://procurementhost.netlify.app/keranjang.html" />
+  <meta property="og:image" content="https://procurementhost.netlify.app/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Keranjang — ProcurementHost" />
+  <meta name="twitter:description" content="Keranjang belanja ProcurementHost — pesan beberapa paket sekaligus." />
+  <meta name="twitter:image" content="https://procurementhost.netlify.app/og-image.png" />
+  <link rel="canonical" href="https://procurementhost.netlify.app/keranjang.html" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="page-head">
+    <div class="container">
+      <p class="crumb"><a href="index.html">Beranda</a> / Keranjang</p>
+      <h1>Keranjang Belanja 🛒</h1>
+      <p>Pesan beberapa layanan sekaligus dalam satu kali pembayaran.</p>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="cart-grid" id="cartGrid">
+      <div id="cartItems"></div>
+      <aside class="summary">
+        <h3>Ringkasan</h3>
+        <div class="coupon-box">
+          <input type="text" id="couponInput" placeholder="Kode kupon (mis. HEMAT10)" autocomplete="off" aria-label="Kode kupon" />
+          <button type="button" class="btn btn-outline btn-sm" id="couponBtn">Terapkan</button>
+        </div>
+        <p class="coupon-msg" id="couponMsg" role="status" aria-live="polite"></p>
+        <div class="sum-row"><span>Subtotal</span><span id="sSubtotal">Rp0</span></div>
+        <div class="sum-row sum-discount" id="sDiscountRow" style="display:none"><span id="sDiscountLabel">Diskon</span><span id="sDiscount">−Rp0</span></div>
+        <div class="sum-row"><span>PPN 11%</span><span id="sPpn">Rp0</span></div>
+        <div class="sum-total"><span>Total</span><span id="sTotal">Rp0</span></div>
+        <button class="btn btn-primary btn-block" id="checkoutBtn" style="margin-top:18px">Bayar Sekarang</button>
+        <p style="text-align:center;color:var(--muted);font-size:.82rem;margin-top:12px">💯 Garansi uang kembali 30 hari</p>
+      </aside>
+    </div>
+
+    <div id="cartEmpty" hidden>
+      <div class="empty" style="padding:60px 20px">
+        <div class="e-ic" style="font-size:3rem">🛒</div>
+        <p>Keranjang Anda masih kosong.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px">
+          <a href="index.html#harga" class="btn btn-primary">Lihat Web Hosting</a>
+          <a href="vps.html" class="btn btn-outline">Lihat VPS</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const { Cart, Services, Billing, Auth, PLANS, COUPONS, PPN_RATE, toast, rp, PAGE } = window.NH;
+      let appliedCoupon = null;
+
+      const priceOf = (it) => Services.priceFor(it.plan, it.cycle);
+
+      function calc() {
+        const subtotal = Cart.items().reduce((s, it) => s + priceOf(it), 0);
+        const rate = appliedCoupon ? COUPONS[appliedCoupon].rate : 0;
+        const discount = Math.round(subtotal * rate);
+        const afterDisc = subtotal - discount;
+        const ppn = Math.round(afterDisc * PPN_RATE);
+        return { subtotal, discount, ppn, total: afterDisc + ppn };
+      }
+
+      function render() {
+        const items = Cart.items();
+        document.getElementById('cartGrid').hidden = items.length === 0;
+        document.getElementById('cartEmpty').hidden = items.length !== 0;
+        if (!items.length) return;
+
+        document.getElementById('cartItems').innerHTML = items.map((it, i) => {
+          const p = PLANS[it.plan];
+          return `<div class="cart-item">
+            <div class="ci-info">
+              <strong>${p.name}</strong>
+              <small>${p.storage}${it.domain ? ' · ' + it.domain : ''}</small>
+            </div>
+            <div class="ci-right">
+              <select class="cart-cycle" data-cycle="${i}">
+                <option value="monthly" ${it.cycle==='monthly'?'selected':''}>Bulanan — ${rp(p.monthly)}/bln</option>
+                <option value="yearly" ${it.cycle==='yearly'?'selected':''}>Tahunan — ${rp(p.yearly)}/bln</option>
+              </select>
+              <span class="cart-price">${rp(priceOf(it))}</span>
+              <button class="btn btn-danger btn-xs" data-remove="${i}">Hapus</button>
+            </div>
+          </div>`;
+        }).join('');
+
+        const { subtotal, discount, ppn, total } = calc();
+        document.getElementById('sSubtotal').textContent = rp(subtotal);
+        document.getElementById('sPpn').textContent = rp(ppn);
+        document.getElementById('sTotal').textContent = rp(total);
+        const dRow = document.getElementById('sDiscountRow');
+        if (discount > 0) {
+          dRow.style.display = '';
+          document.getElementById('sDiscountLabel').textContent = `Diskon (${COUPONS[appliedCoupon].label})`;
+          document.getElementById('sDiscount').textContent = '−' + rp(discount);
+        } else { dRow.style.display = 'none'; }
+
+        // wiring per-item
+        document.querySelectorAll('.cart-cycle').forEach(sel => sel.addEventListener('change', () => {
+          Cart.setCycle(+sel.dataset.cycle, sel.value); render();
+        }));
+        document.querySelectorAll('[data-remove]').forEach(b => b.addEventListener('click', () => {
+          Cart.remove(+b.dataset.remove); toast('Item dihapus dari keranjang.', 'info'); render();
+        }));
+      }
+      render();
+
+      // kupon
+      document.getElementById('couponBtn').addEventListener('click', () => {
+        const code = document.getElementById('couponInput').value.trim().toUpperCase();
+        const msg = document.getElementById('couponMsg');
+        if (COUPONS[code]) { appliedCoupon = code; msg.textContent = `✓ Kupon "${code}" diterapkan.`; msg.className = 'coupon-msg ok'; }
+        else if (!code) { appliedCoupon = null; msg.textContent = ''; msg.className = 'coupon-msg'; }
+        else { appliedCoupon = null; msg.textContent = '✕ Kode kupon tidak valid.'; msg.className = 'coupon-msg no'; }
+        render();
+      });
+
+      // checkout semua item
+      document.getElementById('checkoutBtn').addEventListener('click', () => {
+        const items = Cart.items();
+        if (!items.length) return;
+        if (!Auth.current()) {
+          toast('Silakan masuk dulu untuk menyelesaikan pesanan.', 'info');
+          setTimeout(() => location.href = 'masuk.html?next=' + encodeURIComponent(PAGE), 1000);
+          return;
+        }
+        const rate = appliedCoupon ? COUPONS[appliedCoupon].rate : 0;
+        items.forEach(it => {
+          const p = PLANS[it.plan];
+          const base = Services.priceFor(it.plan, it.cycle);
+          const disc = Math.round(base * rate);
+          const itemTotal = (base - disc) + Math.round((base - disc) * PPN_RATE);
+          Services.add({
+            planName: p.name, plan: it.plan, cycle: it.cycle, price: base,
+            invoiceAmount: itemTotal, coupon: appliedCoupon, domain: it.domain || '', storage: p.storage,
+          });
+        });
+        Cart.clear();
+        toast(`Pembayaran berhasil! ${items.length} layanan aktif. 🎉`);
+        setTimeout(() => location.href = 'dashboard.html', 1100);
+      });
+    });
+  </script>
+</body>
+</html>
