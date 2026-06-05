@@ -1,0 +1,17 @@
+{
+  "name": "ProcurementHost — Web Hosting",
+  "short_name": "ProcurementHost",
+  "description": "Hosting cepat & andal: NVMe, SSL gratis, uptime 99,9%, dukungan 24/7.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0b1120",
+  "theme_color": "#6366f1",
+  "lang": "id",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any maskable" }
+  ]
+}

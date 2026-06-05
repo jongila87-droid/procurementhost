@@ -735,6 +735,18 @@
     document.head.appendChild(fav);
   }
 
+  // PWA: manifest, warna tema (address bar HP), & ikon iOS — disuntik ke semua halaman
+  if (!document.querySelector('link[rel="manifest"]')) {
+    const mani = document.createElement('link'); mani.rel = 'manifest'; mani.href = 'manifest.json'; document.head.appendChild(mani);
+    const tcol = document.createElement('meta'); tcol.name = 'theme-color'; tcol.content = '#6366f1'; document.head.appendChild(tcol);
+    const atch = document.createElement('link'); atch.rel = 'apple-touch-icon'; atch.href = 'icon-192.png'; document.head.appendChild(atch);
+  }
+
+  // Daftarkan Service Worker (offline/PWA) — hanya di http/https, bukan saat dibuka file://
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+  }
+
   initTheme(); // sebelum render agar tidak berkedip
   document.addEventListener('DOMContentLoaded', () => {
     renderChrome();

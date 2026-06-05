@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard.html
+Disallow: /checkout.html
+
+Sitemap: https://procurementhost.netlify.app/sitemap.xml
