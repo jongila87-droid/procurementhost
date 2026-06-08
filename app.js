@@ -314,12 +314,13 @@
         <span>Procurement<strong>Host</strong></span>
       </a>
       <nav class="nav-links" id="navLinks" aria-label="Navigasi utama">
-        <div class="nav-menu">${navItems}</div>
-        <div class="nav-actions">
+        <div class="nav-menu">${navItems}
         <button class="theme-btn" id="themeBtn" aria-label="Ganti mode gelap/terang" title="Mode gelap/terang">🌙</button>
         <a href="keranjang.html" class="cart-link" id="cartLink" aria-label="Keranjang belanja" title="Keranjang">
           🛒<span class="cart-badge" id="cartBadge" hidden>0</span>
         </a>
+        </div>
+        <div class="nav-actions">
         <span class="nav-auth" id="navAuth"></span>
         <span class="lang-switch notranslate" id="langSwitch" translate="no">
           <button class="lang-btn" id="langBtn" aria-label="Pilih bahasa" aria-haspopup="true" aria-expanded="false">
