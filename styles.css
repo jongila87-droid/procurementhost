@@ -349,14 +349,19 @@ img { max-width: 100%; display: block; }
 
 /* ---------- Header tweaks (theme btn, auth) ---------- */
 .header { background: var(--header-bg); }
-/* Header full-width 3 zona: logo kiri — menu rapi di tengah — aksi kanan */
-.header .nav { max-width: none; padding-left: 40px; padding-right: 40px; gap: 20px; }
-.header .nav-links { flex: 1; gap: 18px; }
-.nav-menu { flex: 1; display: flex; align-items: center; justify-content: center; gap: 34px; }
-.nav-actions { display: flex; align-items: center; gap: 18px; flex-shrink: 0; }
+/* Header 3-zona via GRID: logo kiri — menu+ikon TEPAT di tengah viewport (stabil, tak bergeser
+   saat login/logout) — akun & bahasa kanan. nav-links di-"larut"-kan (display:contents) agar
+   nav-menu & nav-actions menjadi item grid langsung. */
+.header .nav { max-width: none; padding-left: 40px; padding-right: 40px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; }
+.header .logo { justify-self: start; }
+.header .nav-links { display: contents; }
+.nav-menu { display: flex; align-items: center; justify-content: center; gap: 34px; }
+.nav-menu .theme-btn { margin-left: 10px; }
+.nav-menu .cart-link { margin-right: 2px; }
+.nav-actions { display: flex; align-items: center; gap: 18px; justify-self: end; }
 @media (max-width: 760px) {
-  .header .nav { padding-left: 20px; padding-right: 20px; }
-  .header .nav-links { flex: initial; }
+  .header .nav { display: flex; justify-content: space-between; padding-left: 20px; padding-right: 20px; }
+  .header .nav-links { display: flex; }
   .nav-menu, .nav-actions { display: contents; }
 }
 .theme-btn { background: none; border: 0; font-size: 1.1rem; cursor: pointer; padding: 6px; border-radius: 8px; line-height: 1; transition: background .2s; }
