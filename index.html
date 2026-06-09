@@ -58,8 +58,10 @@
   <!-- ============ HEADER / NAVBAR (diisi otomatis oleh app.js) ============ -->
   <div id="site-header"></div>
 
-  <!-- ============ HERO ============ -->
+  <!-- ============ HERO (latar VIDEO full-width, gaya Hostinger) ============ -->
   <section class="hero" id="beranda">
+    <video class="hero-bg-video" id="heroVideo" muted playsinline preload="auto" aria-hidden="true"></video>
+    <div class="hero-scrim"></div>
     <div class="container hero-grid">
       <div class="hero-text reveal">
         <span class="badge">⚡ Hosting tercepat &amp; teraman tahun ini</span>
@@ -82,21 +84,8 @@
           <li>✓ Gratis migrasi website</li>
         </ul>
       </div>
-
-      <div class="hero-visual reveal">
-        <div class="glass-card">
-          <div class="window-dots"><span></span><span></span><span></span></div>
-          <div class="stat-row">
-            <div class="mini-stat"><span class="mini-num" data-count="99.9" data-suffix="%">0</span><small>Uptime</small></div>
-            <div class="mini-stat"><span class="mini-num" data-count="0.4" data-suffix="s">0</span><small>Load Time</small></div>
-          </div>
-          <div class="bar"><i style="--w:96%"></i></div>
-          <div class="bar"><i style="--w:82%"></i></div>
-          <div class="bar"><i style="--w:90%"></i></div>
-          <p class="card-foot">Performa server real-time</p>
-        </div>
-      </div>
     </div>
+    <button class="hero-vid-toggle" id="heroVidToggle" aria-label="Putar/Jeda video" title="Putar/Jeda video">⏸</button>
   </section>
 
   <!-- ============ LOGO STRIP ============ -->
@@ -338,5 +327,26 @@
 
   <script src="app.js"></script>
   <script src="script.js"></script>
+  <script>
+    // Video latar HERO: putar 2 klip AI/teknologi berurutan & berulang tanpa henti (autoplay, tanpa suara)
+    document.addEventListener('DOMContentLoaded', () => {
+      const vid = document.getElementById('heroVideo');
+      const tog = document.getElementById('heroVidToggle');
+      if (!vid) return;
+      const clips = [
+        'https://cdn.pixabay.com/video/2023/08/01/174086-850404739_large.mp4',
+        'https://cdn.pixabay.com/video/2024/04/25/209409_large.mp4'
+      ];
+      let idx = 0;
+      vid.muted = true;
+      const play = (n) => { idx = n; vid.src = clips[n]; const p = vid.play(); if (p && p.catch) p.catch(() => {}); };
+      vid.addEventListener('ended', () => play((idx + 1) % clips.length)); // ulang sekuens selamanya
+      play(0);
+      if (tog) tog.addEventListener('click', () => {
+        if (vid.paused) { vid.play(); tog.textContent = '⏸'; }
+        else { vid.pause(); tog.textContent = '▶'; }
+      });
+    });
+  </script>
 </body>
 </html>
