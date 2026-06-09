@@ -181,6 +181,7 @@ img { max-width: 100%; display: block; }
 .section-head p { color: var(--slate); margin-top: 14px; font-size: 1.05rem; }
 
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
 
 /* ---------- Feature cards ---------- */
@@ -192,6 +193,17 @@ img { max-width: 100%; display: block; }
 .f-icon { width: 54px; height: 54px; display: grid; place-items: center; font-size: 1.6rem; background: #eef2ff; border-radius: 14px; margin-bottom: 18px; }
 .feature-card h3 { font-size: 1.2rem; margin-bottom: 8px; }
 .feature-card p { color: var(--slate); font-size: .97rem; }
+/* Kartu produk (klik seluruh kartu) */
+.prod-card {
+  display: block; background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 28px 26px; transition: transform .25s, box-shadow .25s, border-color .25s;
+}
+.prod-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: #c7d2fe; }
+.prod-card h3 { font-size: 1.18rem; margin-bottom: 8px; color: var(--ink); }
+.prod-card p { color: var(--slate); font-size: .95rem; margin-bottom: 14px; }
+.prod-link { color: var(--indigo); font-weight: 600; font-size: .95rem; }
+[data-theme="dark"] .prod-card { background: var(--card); border-color: var(--line); }
+[data-theme="dark"] .prod-card h3 { color: #fff; }
 
 /* ---------- Stats ---------- */
 .stats { background: var(--bg-grad); padding: 60px 0; color: #fff; }
@@ -217,6 +229,7 @@ img { max-width: 100%; display: block; }
 .price-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
 .price-card.popular { border: 2px solid var(--indigo); box-shadow: var(--shadow-lg); }
 .ribbon { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--bg-grad); color: #fff; font-size: .78rem; font-weight: 700; padding: 6px 16px; border-radius: 99px; white-space: nowrap; }
+.ribbon-cheap { background: linear-gradient(135deg, #10b981, #059669); }
 .price-card h3 { font-size: 1.35rem; }
 .price-desc { color: var(--muted); font-size: .92rem; margin: 6px 0 18px; min-height: 42px; }
 .price { display: flex; align-items: baseline; gap: 3px; margin-bottom: 22px; }
@@ -319,6 +332,7 @@ img { max-width: 100%; display: block; }
   .nav-links a.btn { margin-top: 12px; border-bottom: 0; }
   .nav-toggle { display: flex; }
   .grid-3 { grid-template-columns: 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
   .section { padding: 64px 0; }
   .cf-row { grid-template-columns: 1fr; }
   .domain-search { flex-direction: column; }

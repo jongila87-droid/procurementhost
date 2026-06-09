@@ -35,6 +35,17 @@
     'ded-entry':      { name: 'Dedicated Entry',      monthly: 1500000, yearly: 1300000, storage: '1 TB NVMe', category: 'dedicated', cpu: 'Xeon 4 Core', ram: '16 GB RAM' },
     'ded-power':      { name: 'Dedicated Power',      monthly: 2900000, yearly: 2500000, storage: '2 TB NVMe', category: 'dedicated', cpu: 'Xeon 8 Core', ram: '32 GB RAM' },
     'ded-enterprise': { name: 'Dedicated Enterprise', monthly: 5500000, yearly: 4800000, storage: '4 TB NVMe', category: 'dedicated', cpu: 'Xeon 16 Core', ram: '64 GB RAM' },
+    // Hosting WordPress — shared hosting yang dioptimalkan untuk WordPress/WooCommerce
+    'wp-personal': { name: 'WordPress Personal', monthly: 20000, yearly: 16000, storage: '20 GB SSD',  category: 'wordpress' },
+    'wp-bisnis':   { name: 'WordPress Bisnis',   monthly: 55000, yearly: 45000, storage: '100 GB SSD', category: 'wordpress' },
+    'wp-pro':      { name: 'WordPress Pro',       monthly: 110000, yearly: 90000, storage: '200 GB SSD', category: 'wordpress' },
+    // Email Hosting — email profesional @domain-sendiri
+    'email-starter': { name: 'Email Starter', monthly: 12000, yearly: 9000,  storage: '10 GB / akun', category: 'email' },
+    'email-bisnis':  { name: 'Email Bisnis',  monthly: 30000, yearly: 24000, storage: '50 GB / akun', category: 'email' },
+    // Cloud Hosting — sumber daya terdedikasi & skalabel, tetap mudah dikelola
+    'cloud-start': { name: 'Cloud Start', monthly: 180000, yearly: 150000, storage: '100 GB NVMe', category: 'cloud', vcpu: '2 vCPU', ram: '3 GB RAM' },
+    'cloud-pro':   { name: 'Cloud Pro',   monthly: 350000, yearly: 290000, storage: '200 GB NVMe', category: 'cloud', vcpu: '4 vCPU', ram: '6 GB RAM' },
+    'cloud-max':   { name: 'Cloud Max',   monthly: 650000, yearly: 540000, storage: '300 GB NVMe', category: 'cloud', vcpu: '6 vCPU', ram: '12 GB RAM' },
   };
 
   // Pajak & kupon promo (dipakai di checkout)
@@ -288,6 +299,7 @@
       { label: 'Beranda', href: 'index.html', match: 'index.html' },
       { label: 'Fitur',   href: 'index.html#fitur' },
       { label: 'Harga',   href: 'index.html#harga' },
+      { label: 'Produk',  href: 'index.html#produk' },
       { label: 'VPS',     href: 'vps.html',     match: 'vps.html' },
       { label: 'Blog',    href: 'blog.html',    match: 'blog.html|artikel.html' },
       { label: 'Tentang', href: 'tentang.html', match: 'tentang.html' },
@@ -367,6 +379,9 @@
       <div>
         <h4>Produk</h4>
         <a href="index.html#harga">Web Hosting</a>
+        <a href="hosting-wordpress.html">Hosting WordPress</a>
+        <a href="cloud-hosting.html">Cloud Hosting</a>
+        <a href="email-hosting.html">Email Hosting</a>
         <a href="vps.html">VPS &amp; Cloud</a>
         <a href="dedicated.html">Dedicated Server</a>
         <a href="index.html#domain">Domain</a>
