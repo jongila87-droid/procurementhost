@@ -28,6 +28,9 @@
   <div id="site-header"></div>
 
   <main class="dash">
+    <video class="dash-bg-video" id="dashVideo" muted playsinline preload="auto" loop aria-hidden="true"></video>
+    <div class="dash-scrim"></div>
+    <button class="dash-vid-toggle" id="dashVidToggle" aria-label="Putar/Jeda video latar" title="Putar/Jeda video latar">⏸</button>
     <div class="container dash-grid">
       <!-- Sidebar -->
       <aside class="dash-side">
@@ -485,6 +488,21 @@
           a.classList.add('active');
           document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
         });
+      });
+    });
+  </script>
+  <script>
+    // Video latar belakang dasbor (autoplay, bisu, berulang)
+    document.addEventListener('DOMContentLoaded', () => {
+      const vid = document.getElementById('dashVideo');
+      const tog = document.getElementById('dashVidToggle');
+      if (!vid) return;
+      vid.muted = true;
+      vid.src = 'https://cdn.pixabay.com/video/2016/02/16/2182-155747492_large.mp4';
+      const p = vid.play(); if (p && p.catch) p.catch(() => {});
+      if (tog) tog.addEventListener('click', () => {
+        if (vid.paused) { vid.play(); tog.textContent = '⏸'; }
+        else { vid.pause(); tog.textContent = '▶'; }
       });
     });
   </script>
