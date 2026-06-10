@@ -289,7 +289,18 @@ img { max-width: 100%; display: block; }
 .form-msg { text-align: center; margin-top: 14px; font-weight: 600; min-height: 22px; }
 
 /* ---------- Footer ---------- */
-.footer { background: var(--ink); color: #cbd5e1; padding: 60px 0 30px; }
+.footer { background: #0b1120; color: #cbd5e1; padding: 60px 0 30px; }
+/* ikon media sosial */
+.foot-social { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+.foot-social a { width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,.08); display: grid; place-items: center; color: #cbd5e1; margin: 0; transition: background .2s, transform .2s, color .2s; }
+.foot-social a:hover { background: var(--indigo); color: #fff; transform: translateY(-2px); }
+.foot-social svg { width: 18px; height: 18px; }
+/* strip metode pembayaran */
+.foot-pay { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 34px; }
+.foot-pay-label { color: #cbd5e1; font-size: .9rem; font-weight: 600; }
+.foot-pay-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.pay-badge { background: #fff; color: #1e293b; font-size: .74rem; font-weight: 700; padding: 6px 12px; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+@media (max-width: 560px) { .foot-pay { flex-direction: column; align-items: flex-start; gap: 12px; } }
 .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 30px; }
 .foot-desc { margin-top: 14px; color: #94a3b8; max-width: 280px; font-size: .94rem; }
 .footer h4 { color: #fff; margin-bottom: 16px; font-size: 1rem; }
