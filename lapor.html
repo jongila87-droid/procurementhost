@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laporkan Penyalahgunaan — ProcurementHost</title>
+  <meta name="description" content="Laporkan penyalahgunaan layanan ProcurementHost: spam, phishing, malware, penipuan, konten ilegal, atau pelanggaran hak cipta. Setiap laporan kami tindak serius." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Open Graph / Social preview (disuntik otomatis) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="ProcurementHost" />
+  <meta property="og:title" content="Laporkan Penyalahgunaan — ProcurementHost" />
+  <meta property="og:description" content="Laporkan spam, phishing, malware, penipuan, atau konten ilegal pada layanan kami. Setiap laporan ditindak serius." />
+  <meta property="og:url" content="https://procurementhost.netlify.app/lapor.html" />
+  <meta property="og:image" content="https://procurementhost.netlify.app/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Laporkan Penyalahgunaan — ProcurementHost" />
+  <meta name="twitter:description" content="Laporkan spam, phishing, malware, penipuan, atau konten ilegal pada layanan kami." />
+  <meta name="twitter:image" content="https://procurementhost.netlify.app/og-image.png" />
+  <link rel="canonical" href="https://procurementhost.netlify.app/lapor.html" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="page-head">
+    <div class="container">
+      <p class="crumb"><a href="index.html">Beranda</a> / Laporkan Penyalahgunaan</p>
+      <h1>Laporkan Penyalahgunaan 🚨</h1>
+      <p>Menemukan aktivitas mencurigakan pada layanan kami? Bantu kami menjaga internet tetap aman. Setiap laporan ditangani dengan serius &amp; rahasia.</p>
+    </div>
+  </section>
+
+  <!-- Jenis penyalahgunaan -->
+  <section class="section" style="padding-bottom:40px">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Yang Bisa Dilaporkan</span>
+        <h2>Jenis penyalahgunaan</h2>
+      </div>
+      <div class="grid-3">
+        <article class="feature-card reveal"><div class="f-icon">🎣</div><h3>Phishing &amp; Penipuan</h3><p>Halaman palsu yang mencuri data atau menipu pengguna.</p></article>
+        <article class="feature-card reveal"><div class="f-icon">🦠</div><h3>Malware &amp; Virus</h3><p>Website yang menyebarkan program berbahaya.</p></article>
+        <article class="feature-card reveal"><div class="f-icon">📧</div><h3>Spam</h3><p>Pengiriman email massal yang tidak diminta dari layanan kami.</p></article>
+        <article class="feature-card reveal"><div class="f-icon">⚖️</div><h3>Konten Ilegal</h3><p>Konten yang melanggar hukum yang berlaku.</p></article>
+        <article class="feature-card reveal"><div class="f-icon">©️</div><h3>Pelanggaran Hak Cipta</h3><p>Penggunaan karya berhak cipta tanpa izin.</p></article>
+        <article class="feature-card reveal"><div class="f-icon">🚫</div><h3>Lainnya</h3><p>Bentuk penyalahgunaan lain yang merugikan.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Form laporan -->
+  <section class="section faq-section" id="form" style="padding-top:40px">
+    <div class="container" style="max-width:680px">
+      <div class="section-head reveal">
+        <span class="eyebrow">Formulir Laporan</span>
+        <h2>Kirimkan laporan Anda</h2>
+        <p>Lengkapi detail di bawah. Semakin lengkap, semakin cepat kami menindaklanjuti.</p>
+      </div>
+      <form id="abuseForm" class="abuse-form reveal" autocomplete="off">
+        <div class="field">
+          <label for="afUrl">URL / Domain yang dilaporkan <span style="color:#dc2626">*</span></label>
+          <input type="text" id="afUrl" placeholder="contoh: situs-mencurigakan.com" required />
+        </div>
+        <div class="field">
+          <label for="afType">Jenis penyalahgunaan <span style="color:#dc2626">*</span></label>
+          <select id="afType" required>
+            <option value="">— Pilih jenis —</option>
+            <option>Phishing / Penipuan</option>
+            <option>Malware / Virus</option>
+            <option>Spam</option>
+            <option>Konten Ilegal</option>
+            <option>Pelanggaran Hak Cipta</option>
+            <option>Lainnya</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="afDesc">Deskripsi <span style="color:#dc2626">*</span></label>
+          <textarea id="afDesc" rows="4" placeholder="Jelaskan apa yang Anda temukan…" required></textarea>
+        </div>
+        <div class="field">
+          <label for="afEmail">Email Anda (opsional)</label>
+          <input type="email" id="afEmail" placeholder="email@anda.com — agar kami bisa mengabari hasilnya" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">🚨 Kirim Laporan</button>
+        <div class="abuse-result" id="abuseResult" role="status" aria-live="polite"></div>
+        <p class="whois-note" style="text-align:center">🔒 Laporan Anda kami jaga kerahasiaannya. Laporan palsu dapat diabaikan.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container cta-inner reveal">
+      <h2>Butuh bantuan lain?</h2>
+      <p>Untuk pertanyaan umum atau dukungan akun, tim kami siap membantu.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px">
+        <a href="bantuan.html" class="btn btn-light">❓ Pusat Bantuan</a>
+        <a href="kontak.html" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.6)">💬 Hubungi Kami</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('abuseForm');
+      const out = document.getElementById('abuseResult');
+      if (!form) return;
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const url = document.getElementById('afUrl').value.trim();
+        const type = document.getElementById('afType').value;
+        const desc = document.getElementById('afDesc').value.trim();
+        if (!url || !type || !desc) {
+          out.className = 'abuse-result no';
+          out.textContent = 'Mohon lengkapi kolom bertanda *.';
+          return;
+        }
+        const ref = 'ABUSE-' + Date.now().toString(36).toUpperCase().slice(-6);
+        out.className = 'abuse-result ok';
+        out.innerHTML = `✅ Terima kasih! Laporan Anda telah kami terima dengan nomor <strong>${ref}</strong>. Tim kami akan meninjaunya. 🙏`;
+        form.querySelectorAll('input, select, textarea').forEach(el => { el.value = ''; });
+        out.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    });
+  </script>
+</body>
+</html>

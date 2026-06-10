@@ -947,6 +947,14 @@ details.faq-item p { padding: 0 22px 18px; margin: 0; color: var(--slate); }
 @media (max-width: 860px) { .sitemap-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .sitemap-grid { grid-template-columns: 1fr; } }
 
+/* ---------- Form Laporan Penyalahgunaan ---------- */
+.abuse-form { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 30px; }
+.abuse-result { margin-top: 14px; font-size: .96rem; }
+.abuse-result.ok { background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; border-radius: 12px; padding: 14px 16px; }
+.abuse-result.no { color: #dc2626; font-weight: 600; }
+.abuse-result a { color: var(--indigo); font-weight: 600; }
+[data-theme="dark"] .abuse-result.ok { background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.4); color: #6ee7b7; }
+
 /* ---------- Statistik Teknologi ---------- */
 .tech-stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px 20px; text-align: center; }
 .tech-stat .ts-num { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 2rem; color: var(--indigo); line-height: 1; }

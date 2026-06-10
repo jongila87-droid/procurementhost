@@ -399,6 +399,7 @@
         <a href="prinsip.html">Prinsip Kami</a>
         <a href="blog.html">Blog</a>
         <a href="bantuan.html">Pusat Bantuan</a>
+        <a href="tutorial.html">Panduan &amp; Tutorial</a>
         <a href="kontak.html">Kontak</a>
         <a href="afiliasi.html">Program Afiliasi</a>
         <a href="keamanan.html">Pusat Transparansi Keamanan</a>
@@ -417,6 +418,7 @@
         <a href="privasi.html">Kebijakan Privasi</a>
         <a href="keamanan.html">Keamanan</a>
         <a href="sitemap.html">Peta Situs</a>
+        <a href="lapor.html">Laporkan Penyalahgunaan</a>
         <a href="kontak.html">Kontak</a>
       </nav>
     </div>`;
