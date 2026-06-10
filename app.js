@@ -300,6 +300,7 @@
       { label: 'Fitur',   href: 'index.html#fitur' },
       { label: 'Harga',   href: 'index.html#harga' },
       { label: 'Produk',  href: 'index.html#produk' },
+      { label: 'Domain',  href: 'domain.html',  match: 'domain.html' },
       { label: 'VPS',     href: 'vps.html',     match: 'vps.html' },
       { label: 'Blog',    href: 'blog.html',    match: 'blog.html|artikel.html' },
       { label: 'Tentang', href: 'tentang.html', match: 'tentang.html' },
@@ -384,7 +385,7 @@
         <a href="email-hosting.html">Email Hosting</a>
         <a href="vps.html">VPS &amp; Cloud</a>
         <a href="dedicated.html">Dedicated Server</a>
-        <a href="index.html#domain">Domain</a>
+        <a href="domain.html">Domain</a>
         <a href="index.html#fitur">Fitur</a>
         <a href="tes-kecepatan.html">Tes Kecepatan</a>
         <a href="status.html">Status Sistem</a>
