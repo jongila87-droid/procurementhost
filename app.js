@@ -386,6 +386,8 @@
         <a href="vps.html">VPS &amp; Cloud</a>
         <a href="dedicated.html">Dedicated Server</a>
         <a href="domain.html">Domain</a>
+        <a href="website-builder.html">Website Builder</a>
+        <a href="migrasi.html">Migrasi Website</a>
         <a href="index.html#fitur">Fitur</a>
         <a href="tes-kecepatan.html">Tes Kecepatan</a>
         <a href="status.html">Status Sistem</a>

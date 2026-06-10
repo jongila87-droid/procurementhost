@@ -913,3 +913,26 @@ body { top: 0 !important; }
   .dom-promo { flex-direction: column; text-align: center; }
   .whois-table th { width: 130px; }
 }
+
+/* ---------- FAQ versi <details> (halaman Migrasi dll) ---------- */
+details.faq-item { margin-bottom: 12px; }
+details.faq-item summary { padding: 18px 22px; cursor: pointer; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1.02rem; color: var(--ink); list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+details.faq-item summary::-webkit-details-marker { display: none; }
+details.faq-item summary::after { content: '+'; color: var(--indigo); font-size: 1.5rem; transition: transform .25s; }
+details.faq-item[open] summary::after { transform: rotate(45deg); }
+details.faq-item p { padding: 0 22px 18px; margin: 0; color: var(--slate); }
+
+/* ---------- Kartu Template (Website Builder) ---------- */
+.tpl-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; transition: transform .25s, box-shadow .25s; }
+.tpl-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
+.tpl-thumb { height: 140px; display: grid; place-items: center; font-size: 3.2rem; }
+.tpl-thumb.tpl-1 { background: linear-gradient(135deg,#6366f1,#8b5cf6); }
+.tpl-thumb.tpl-2 { background: linear-gradient(135deg,#f97316,#ef4444); }
+.tpl-thumb.tpl-3 { background: linear-gradient(135deg,#0ea5e9,#2563eb); }
+.tpl-thumb.tpl-4 { background: linear-gradient(135deg,#ec4899,#a855f7); }
+.tpl-thumb.tpl-5 { background: linear-gradient(135deg,#10b981,#059669); }
+.tpl-thumb.tpl-6 { background: linear-gradient(135deg,#f59e0b,#f43f5e); }
+.tpl-body { padding: 20px 22px; }
+.tpl-body h3 { font-size: 1.1rem; margin-bottom: 6px; }
+.tpl-body p { color: var(--slate); font-size: .93rem; }
+[data-theme="dark"] .tpl-card { background: var(--card); }
