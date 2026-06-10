@@ -395,6 +395,8 @@
       <div>
         <h4>Perusahaan</h4>
         <a href="tentang.html">Tentang Kami</a>
+        <a href="teknologi.html">Teknologi Kami</a>
+        <a href="prinsip.html">Prinsip Kami</a>
         <a href="blog.html">Blog</a>
         <a href="bantuan.html">Pusat Bantuan</a>
         <a href="kontak.html">Kontak</a>

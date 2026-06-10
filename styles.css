@@ -946,3 +946,8 @@ details.faq-item p { padding: 0 22px 18px; margin: 0; color: var(--slate); }
 [data-theme="dark"] .sitemap-col { background: var(--card); }
 @media (max-width: 860px) { .sitemap-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .sitemap-grid { grid-template-columns: 1fr; } }
+
+/* ---------- Statistik Teknologi ---------- */
+.tech-stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px 20px; text-align: center; }
+.tech-stat .ts-num { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 2rem; color: var(--indigo); line-height: 1; }
+.tech-stat .ts-lbl { color: var(--slate); font-size: .92rem; margin-top: 8px; }
