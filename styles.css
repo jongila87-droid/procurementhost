@@ -936,3 +936,13 @@ details.faq-item p { padding: 0 22px 18px; margin: 0; color: var(--slate); }
 .tpl-body h3 { font-size: 1.1rem; margin-bottom: 6px; }
 .tpl-body p { color: var(--slate); font-size: .93rem; }
 [data-theme="dark"] .tpl-card { background: var(--card); }
+
+/* ---------- Peta Situs (Sitemap) ---------- */
+.sitemap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.sitemap-col { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 26px; }
+.sitemap-col h3 { font-size: 1.1rem; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.sitemap-col a { display: block; padding: 7px 0; color: var(--slate); font-size: .95rem; transition: color .2s; }
+.sitemap-col a:hover { color: var(--indigo); }
+[data-theme="dark"] .sitemap-col { background: var(--card); }
+@media (max-width: 860px) { .sitemap-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .sitemap-grid { grid-template-columns: 1fr; } }

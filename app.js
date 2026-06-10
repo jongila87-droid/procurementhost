@@ -399,6 +399,7 @@
         <a href="bantuan.html">Pusat Bantuan</a>
         <a href="kontak.html">Kontak</a>
         <a href="afiliasi.html">Program Afiliasi</a>
+        <a href="keamanan.html">Pusat Transparansi Keamanan</a>
       </div>
       <div>
         <h4>Akun</h4>
@@ -412,6 +413,8 @@
       <nav class="foot-legal" aria-label="Tautan legal">
         <a href="syarat.html">Syarat &amp; Ketentuan</a>
         <a href="privasi.html">Kebijakan Privasi</a>
+        <a href="keamanan.html">Keamanan</a>
+        <a href="sitemap.html">Peta Situs</a>
         <a href="kontak.html">Kontak</a>
       </nav>
     </div>`;
