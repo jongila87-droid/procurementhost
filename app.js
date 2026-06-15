@@ -42,6 +42,10 @@
     // Email Hosting — email profesional @domain-sendiri
     'email-starter': { name: 'Email Starter', monthly: 12000, yearly: 9000,  storage: '10 GB / akun', category: 'email' },
     'email-bisnis':  { name: 'Email Bisnis',  monthly: 30000, yearly: 24000, storage: '50 GB / akun', category: 'email' },
+    // Google Workspace — email Gmail @domain + alat kerja Google (per pengguna)
+    'gws-starter':  { name: 'Workspace Business Starter',  monthly: 60000,  yearly: 50000,  storage: '30 GB / pengguna', category: 'workspace' },
+    'gws-standard': { name: 'Workspace Business Standard', monthly: 130000, yearly: 110000, storage: '2 TB / pengguna',  category: 'workspace' },
+    'gws-plus':     { name: 'Workspace Business Plus',     monthly: 250000, yearly: 210000, storage: '5 TB / pengguna',  category: 'workspace' },
     // Cloud Hosting — sumber daya terdedikasi & skalabel, tetap mudah dikelola
     'cloud-start': { name: 'Cloud Start', monthly: 180000, yearly: 150000, storage: '100 GB NVMe', category: 'cloud', vcpu: '2 vCPU', ram: '3 GB RAM' },
     'cloud-pro':   { name: 'Cloud Pro',   monthly: 350000, yearly: 290000, storage: '200 GB NVMe', category: 'cloud', vcpu: '4 vCPU', ram: '6 GB RAM' },
@@ -380,9 +384,11 @@
       <div>
         <h4>Produk</h4>
         <a href="index.html#harga">Web Hosting</a>
+        <a href="hosting-murah.html">Hosting Murah</a>
         <a href="hosting-wordpress.html">Hosting WordPress</a>
         <a href="cloud-hosting.html">Cloud Hosting</a>
         <a href="email-hosting.html">Email Hosting</a>
+        <a href="google-workspace.html">Google Workspace</a>
         <a href="vps.html">VPS &amp; Cloud</a>
         <a href="dedicated.html">Dedicated Server</a>
         <a href="domain.html">Domain</a>
