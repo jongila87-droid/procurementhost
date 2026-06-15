@@ -392,7 +392,10 @@
         <a href="vps.html">VPS &amp; Cloud</a>
         <a href="dedicated.html">Dedicated Server</a>
         <a href="domain.html">Domain</a>
+        <a href="ssl.html">Sertifikat SSL</a>
         <a href="website-builder.html">Website Builder</a>
+        <a href="instant-deploy.html">Instant Deploy</a>
+        <a href="jasa-website.html">Jasa Buat Website</a>
         <a href="migrasi.html">Migrasi Website</a>
         <a href="index.html#fitur">Fitur</a>
         <a href="tes-kecepatan.html">Tes Kecepatan</a>
